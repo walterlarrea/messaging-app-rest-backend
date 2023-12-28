@@ -28,7 +28,12 @@ usersRouter.get('/:email', async (req, res) => {
     .where('email like :email')
     .bind('email', req.params.email)
     .execute()
-  const user = result.fetchOne()
+  const columns = result.getColumns().map(col => col.getColumnName())
+
+  const user = [result.fetchOne()].map(user =>
+    user.reduce((acc, val, i) => {
+      return { ...acc, [columns[i]]: val }
+    }, {}))
 
   closeSession()
   user ? res.json(user)
