@@ -1,5 +1,7 @@
 import { hash } from 'bcrypt'
 import express from 'express'
+import { validationResult } from 'express-validator'
+import userValiation from '../validators/userValidation.js'
 import getSessionTable from '../utils/mySqlConnection.js'
 
 const usersRouter = express.Router()
@@ -8,7 +10,12 @@ usersRouter.get('/', async (req, res) => {
   const [userTable, closeSession] = await getSessionTable('user')
 
   const result = await userTable.select().execute()
-  const users = result.fetchAll()
+  const columns = result.getColumns().map(col => col.getColumnName())
+
+  const users = result.fetchAll().map(user =>
+    user.reduce((acc, val, i) => {
+      return { ...acc, [columns[i]]: val }
+    }, {}))
 
   closeSession()
   res.json(users)
@@ -30,8 +37,13 @@ usersRouter.get('/:email', async (req, res) => {
     })
 })
 
-usersRouter.post('/', async (req, res) => {
+usersRouter.post('/', userValiation, async (req, res) => {
   const { email, name, last_name, username, password } = req.body
+
+  const { errors } = validationResult(req)
+  if (errors.length > 0) {
+    return res.status(422).json({ errors })
+  }
 
   const [userTable, closeSession] = await getSessionTable('user')
 
@@ -44,7 +56,9 @@ usersRouter.post('/', async (req, res) => {
 
   if (existingUser.fetchAll().length > 0) {
     return res.status(400).json({
-      error: 'username and email must be unique'
+      errors: [
+        { msg: 'username and email must be unique' }
+      ]
     })
   }
 
@@ -54,11 +68,9 @@ usersRouter.post('/', async (req, res) => {
   const userCreated = await userTable
     .insert(['email', 'name', 'last_name',
       'username', 'password', 'user_type', 'active'])
-    .values([email, name, last_name,
+    .values([email, name, last_name || '',
       username, passwordHash, 'user', 'inactive'])
     .execute()
-
-  console.log(userCreated.getWarningsCount())
 
   closeSession()
   res.status(201).json({
