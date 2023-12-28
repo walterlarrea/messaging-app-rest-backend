@@ -10,7 +10,24 @@ usersRouter.get('/', async (req, res) => {
   const result = await userTable.select().execute()
   const users = result.fetchAll()
 
+  closeSession()
   res.json(users)
+})
+
+usersRouter.get('/:email', async (req, res) => {
+  const [userTable, closeSession] = await getSessionTable('user')
+
+  const result = await userTable.select()
+    .where('email like :email')
+    .bind('email', req.params.email)
+    .execute()
+  const user = result.fetchOne()
+
+  closeSession()
+  user ? res.json(user)
+    : res.status(404).json({
+      error: 'user not found on the platform'
+    })
 })
 
 usersRouter.post('/', async (req, res) => {
@@ -41,9 +58,12 @@ usersRouter.post('/', async (req, res) => {
       username, passwordHash, 'user', 'inactive'])
     .execute()
 
-  closeSession()
+  console.log(userCreated.getWarningsCount())
 
-  res.status(201).json(userCreated)
+  closeSession()
+  res.status(201).json({
+    userId: userCreated.getAutoIncrementValue()
+  })
 })
 
 export default usersRouter
