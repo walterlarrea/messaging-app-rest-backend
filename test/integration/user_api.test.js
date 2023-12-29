@@ -1,16 +1,15 @@
 import { describe, it, before, beforeEach } from 'node:test'
 import assert from 'node:assert'
 import supertest from 'supertest'
-import app from '../app.js'
-import getSessionForTable from '../utils/mySqlConnection.js'
+import app from '../../app.js'
+import getSessionForTable from '../../utils/mySqlConnection.js'
 import { initialUsers } from './test_initial_data.js'
 
 const api = supertest(app)
+const [userTable] = await getSessionForTable('user')
 
-describe('Retrieve of users data', async () => {
+await describe('Retrieve of users data', async () => {
   before(async () => {
-    const [userTable, closeSession] = await getSessionForTable('user')
-
     await userTable
       .delete()
       .where('id')
@@ -42,8 +41,6 @@ describe('Retrieve of users data', async () => {
         'user',
         'inactive'])
       .execute()
-
-    closeSession()
   })
 
   it('users are returned as json', async () => {
@@ -60,58 +57,44 @@ describe('Retrieve of users data', async () => {
   })
 })
 
-describe('Registering new users', async () => {
+await describe('Registering new users', async () => {
   beforeEach(async () => {
-    const [userTable, closeSession] = await getSessionForTable('user')
+    const testUser = initialUsers[1]
 
     await userTable
       .delete()
       .where('id')
       .execute()
 
-    await userTable
-      .insert([
-        'email',
-        'name',
-        'last_name',
-        'username',
-        'password',
-        'user_type',
-        'active'])
-      .values([
-        initialUsers[1].email,
-        initialUsers[1].name,
-        initialUsers[1].last_name || '',
-        initialUsers[1].username,
-        initialUsers[1].password,
-        'user',
-        'inactive'])
-      .execute()
-
-    closeSession()
+    await api
+      .post('/api/user')
+      .send({
+        email: testUser.email,
+        name: testUser.name,
+        username: testUser.username,
+        password: testUser.password,
+        password_confirm: testUser.password,
+      })
   })
 
   it('succeeds with only email, name, username, pwd & pwd confirmation', async () => {
+    const testUser = initialUsers[0]
     const testUserResponse = await api
       .post('/api/user')
       .send({
-        email: 'walter@mail.com',
-        name: 'Walter',
-        username: 'Walli',
-        password: '12345678',
-        password_confirm: '12345678',
+        email: testUser.email,
+        name: testUser.name,
+        username: testUser.username,
+        password: testUser.password,
+        password_confirm: testUser.password,
       })
     const newUserId = testUserResponse?.body?.userId
-
-    const [userTable, closeSession] = await getSessionForTable('user')
 
     const response = await userTable
       .select()
       .where('id = :id')
       .bind('id', newUserId)
       .execute()
-
-    closeSession()
 
     assert.strictEqual(response.fetchOne()[0], newUserId)
   })
@@ -127,15 +110,11 @@ describe('Registering new users', async () => {
         password_confirm: testUser.password,
       })
 
-    const [userTable, closeSession] = await getSessionForTable('user')
-
     const response = await userTable
       .select()
       .where('username = :username')
       .bind('username', initialUsers[0].username)
       .execute()
-
-    closeSession()
 
     assert.strictEqual(postResponse.status, 422)
     assert.strictEqual(response.fetchOne(), undefined)
@@ -152,15 +131,11 @@ describe('Registering new users', async () => {
         password_confirm: testUser.password,
       })
 
-    const [userTable, closeSession] = await getSessionForTable('user')
-
     const response = await userTable
       .select()
       .where('email = :email')
       .bind('email', testUser.email)
       .execute()
-
-    closeSession()
 
     assert.strictEqual(postResponse.status, 422)
     assert.strictEqual(response.fetchOne(), undefined)
@@ -179,13 +154,9 @@ describe('Registering new users', async () => {
         password_confirm: testUser.password,
       })
 
-    const [userTable, closeSession] = await getSessionForTable('user')
-
     const response = await userTable
       .select()
       .execute()
-
-    closeSession()
 
     assert.strictEqual(postResponse.status, 400)
     assert.strictEqual(response.fetchAll().length, 1)
@@ -204,15 +175,50 @@ describe('Registering new users', async () => {
         password_confirm: testUser.password,
       })
 
-    const [userTable, closeSession] = await getSessionForTable('user')
-
     const response = await userTable
       .select()
       .execute()
 
-    closeSession()
-
     assert.strictEqual(postResponse.status, 400)
     assert.strictEqual(response.fetchAll().length, 1)
+  })
+})
+
+describe('Login via Email', async () => {
+  before(async () => {
+    const testUser = initialUsers[0]
+
+    await userTable
+      .delete()
+      .where('id')
+      .execute()
+
+    await api
+      .post('/api/user')
+      .send({
+        email: testUser.email,
+        name: testUser.name,
+        username: testUser.username,
+        password: testUser.password,
+        password_confirm: testUser.password,
+      })
+  })
+
+  it('succeeds with email and correct password', async () => {
+    const testUser = initialUsers[0]
+    const testUserResponse = await api
+      .post('/api/login')
+      .send({
+        email: testUser.email,
+        password: testUser.password,
+      })
+
+    const newUserToken = testUserResponse?.body?.token
+    const newUserName = testUserResponse?.body?.name
+    const newUserUsername = testUserResponse?.body?.username
+
+    assert(newUserToken)
+    assert(newUserName)
+    assert(newUserUsername)
   })
 })

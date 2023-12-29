@@ -18,24 +18,31 @@ loginRouter.post('/', async (req, res) => {
     .bind('email', email)
     .execute()
 
+  const foundUsers = response.fetchAll()
+
+  if (foundUsers.length === 0) {
+    return res.status(400).json({ errors: [{ msg: 'Email not registered' }] })
+  }
+  if (foundUsers.length > 1) {
+    return res.status(400).json({ errors: [{ msg: 'An unexpected error ocurred' }] })
+  }
+
   const columns = response.getColumns().map(col => col.getColumnName())
-  const user = responseFormatter(columns, [response.fetchOne()])[0]
+  const user = responseFormatter(columns, foundUsers)[0]
 
   const passwordCorrect = user === null
     ? false
     : await compare(password, user.password)
 
   if (!(user && passwordCorrect)) {
-    return res.status(400).json({
-      error: 'invalid username or password'
-    })
+    return res.status(400).json({ error: 'invalid username or password' })
   }
 
   const userForToken = {
     username: user.username,
     id: user.id,
   }
-  console.log(config.JWT_SECRET)
+
   const token = jwt.sign(
     userForToken,
     config.JWT_SECRET,
