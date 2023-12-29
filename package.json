@@ -9,7 +9,8 @@
 		"dev": "nodemon --env-file=.env.development index.js",
 		"lint": "eslint .",
 		"test": "node --test --env-file=.env.test",
-		"format": "prettier --write src/**/*.js"
+		"format:check": "prettier --check *.js ./**/*.js",
+		"format:write": "prettier --write *.js ./**/*.js"
 	},
 	"author": "walter larrea",
 	"license": "ISC",
