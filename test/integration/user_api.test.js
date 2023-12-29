@@ -3,12 +3,12 @@ import assert from 'node:assert'
 import supertest from 'supertest'
 import app from '../../app.js'
 import getSessionForTable from '../../utils/mySqlConnection.js'
-import { initialUsers } from './test_initial_data.js'
+import { initialUsers, initialChannels } from './test_initial_data.js'
 
 const api = supertest(app)
-const [userTable] = await getSessionForTable('user')
+const [userTable] = await getSessionForTable('users')
 
-await describe('Retrieve of users data', async () => {
+describe('Retrieve of users data', async () => {
   before(async () => {
     await userTable
       .delete()
@@ -27,7 +27,7 @@ await describe('Retrieve of users data', async () => {
       .values([
         initialUsers[0].email,
         initialUsers[0].name,
-        initialUsers[0].last_name || '',
+        initialUsers[0].lastName || '',
         initialUsers[0].username,
         initialUsers[0].password,
         'user',
@@ -35,7 +35,7 @@ await describe('Retrieve of users data', async () => {
       .values([
         initialUsers[1].email,
         initialUsers[1].name,
-        initialUsers[1].last_name || '',
+        initialUsers[1].lastName || '',
         initialUsers[1].username,
         initialUsers[1].password,
         'user',
@@ -43,21 +43,21 @@ await describe('Retrieve of users data', async () => {
       .execute()
   })
 
-  it('users are returned as json', async () => {
+  it('returns users as json', async () => {
     const response = await api.get('/api/user')
 
     assert.strictEqual(response.status, 200)
     assert.match(response.headers['content-type'], /application\/json/)
   })
 
-  it('should get all registered users', async () => {
+  it('gets all registered users', async () => {
     const response = await api.get('/api/user')
 
     assert.equal(response.body.length, 2)
   })
 })
 
-await describe('Registering new users', async () => {
+describe('Registering new users', async () => {
   beforeEach(async () => {
     const testUser = initialUsers[1]
 
@@ -77,7 +77,7 @@ await describe('Registering new users', async () => {
       })
   })
 
-  it('succeeds with only email, name, username, pwd & pwd confirmation', async () => {
+  it('succeeds providing only email, name, username, pwd & pwd confirmation', async () => {
     const testUser = initialUsers[0]
     const testUserResponse = await api
       .post('/api/user')
@@ -184,7 +184,9 @@ await describe('Registering new users', async () => {
   })
 })
 
-describe('Login via Email', async () => {
+//// TESTS BEYOND THIS POINT SHOULD LIVE MULTIPLE FILES, THIS IS A BUG REPORTED.
+
+describe('Login user', async () => {
   before(async () => {
     const testUser = initialUsers[0]
 
@@ -204,7 +206,7 @@ describe('Login via Email', async () => {
       })
   })
 
-  it('succeeds with email and correct password', async () => {
+  it('succeeds providing only email & password', async () => {
     const testUser = initialUsers[0]
     const testUserResponse = await api
       .post('/api/login')
@@ -213,12 +215,37 @@ describe('Login via Email', async () => {
         password: testUser.password,
       })
 
-    const newUserToken = testUserResponse?.body?.token
-    const newUserName = testUserResponse?.body?.name
-    const newUserUsername = testUserResponse?.body?.username
+    const { token, name, username } = testUserResponse.body ?? {}
 
-    assert(newUserToken)
-    assert(newUserName)
-    assert(newUserUsername)
+    assert(token)
+    assert(name)
+    assert(username)
+  })
+})
+
+describe('Creating new channels', async () => {
+  // before(async () => {
+
+  // })
+
+  it('succeeds providing only name, description & owner ID', async () => {
+    const testChannel = initialChannels[0]
+    const testChannelResponse = await api
+      .post('/api/channel')
+      .send({
+        name: testChannel.name,
+        description: testChannel.description,
+        owner_id: testChannel.ownerId,
+      })
+
+    const newChannelId = testChannelResponse?.body?.channelId
+
+    const response = await userTable
+      .select()
+      .where('id = :id')
+      .bind('id', newChannelId)
+      .execute()
+
+    assert.strictEqual(response.fetchOne()[0], newChannelId)
   })
 })
