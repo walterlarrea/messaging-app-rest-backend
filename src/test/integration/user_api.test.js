@@ -1,7 +1,7 @@
 import { describe, it, before, beforeEach } from 'node:test'
 import assert from 'node:assert'
 import supertest from 'supertest'
-import app from '../../app.js'
+import app from '../../../app.js'
 import getSessionForTable from '../../utils/mySqlConnection.js'
 import { initialUsers, initialChannels } from './test_initial_data.js'
 
