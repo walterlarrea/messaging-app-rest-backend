@@ -1,13 +1,13 @@
 import { hash } from 'bcrypt'
 import express from 'express'
 import { validationResult } from 'express-validator'
-import userValiation from '../validators/userValidation.js'
-import getSessionTable from '../utils/mySqlConnection.js'
+import userValidation from '../validators/userValidation.js'
+import getSessionForTable from '../utils/mySqlConnection.js'
 
 const usersRouter = express.Router()
 
 usersRouter.get('/', async (req, res) => {
-  const [userTable, closeSession] = await getSessionTable('user')
+  const [userTable, closeSession] = await getSessionForTable('user')
 
   const result = await userTable
     .select(['id', 'email', 'name', 'last_name', 'username', 'user_type', 'active'])
@@ -24,7 +24,7 @@ usersRouter.get('/', async (req, res) => {
 })
 
 /* usersRouter.get('/:id', async (req, res) => {
-  const [userTable, closeSession] = await getSessionTable('user')
+  const [userTable, closeSession] = await getSessionForTable('user')
   const requestedId = req.params.id
 
   const result = await userTable
@@ -47,7 +47,7 @@ usersRouter.get('/', async (req, res) => {
 }) */
 
 usersRouter.get('/:email', async (req, res) => {
-  const [userTable, closeSession] = await getSessionTable('user')
+  const [userTable, closeSession] = await getSessionForTable('user')
   const requestedEmail = req.params.email
 
   const result = await userTable
@@ -69,7 +69,7 @@ usersRouter.get('/:email', async (req, res) => {
     })
 })
 
-usersRouter.post('/', userValiation, async (req, res) => {
+usersRouter.post('/', userValidation, async (req, res) => {
   const { email, name, last_name, username, password } = req.body
 
   const { errors } = validationResult(req)
@@ -77,7 +77,7 @@ usersRouter.post('/', userValiation, async (req, res) => {
     return res.status(422).json({ errors })
   }
 
-  const [userTable, closeSession] = await getSessionTable('user')
+  const [userTable, closeSession] = await getSessionForTable('user')
 
   const existingUser = await userTable
     .select()
