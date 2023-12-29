@@ -1,12 +1,12 @@
 import { checkSchema } from 'express-validator'
 
-const userValiation = checkSchema({
+const userValidation = checkSchema({
   email: {
-    isEmail: {
-      errorMessage: 'Must be a valid e-mail address',
-    },
     notEmpty: {
       errorMessage: 'An e-mail is required',
+    },
+    isEmail: {
+      errorMessage: 'Must be a valid e-mail address',
     },
     isLength: {
       options: { max: 60 },
@@ -71,4 +71,4 @@ const userValiation = checkSchema({
   },
 })
 
-export default userValiation
+export default userValidation

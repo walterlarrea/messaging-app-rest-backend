@@ -8,7 +8,7 @@
     "start": "node --env-file=.env.production index.js",
     "dev": "nodemon --env-file=.env.development index.js",
     "lint": "eslint .",
-    "test": "jest --verbose"
+    "test": "node --env-file=.env.test --test"
   },
   "author": "walter larrea",
   "license": "ISC",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.3"
   }
 }
