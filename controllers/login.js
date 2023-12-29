@@ -10,7 +10,7 @@ const loginRouter = Router()
 loginRouter.post('/', async (req, res) => {
   const { email, password } = req.body
 
-  const [userTable, closeSession] = await getSessionForTable('user')
+  const [userTable, closeSession] = await getSessionForTable('users')
 
   const response = await userTable
     .select(['id', 'email', 'name', 'last_name', 'username', 'password', 'user_type', 'active'])

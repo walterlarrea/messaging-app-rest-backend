@@ -8,7 +8,7 @@ import { responseFormatter } from '../utils/mySqlHelper.js'
 const usersRouter = Router()
 
 usersRouter.get('/', async (req, res) => {
-  const [userTable, closeSession] = await getSessionForTable('user')
+  const [userTable, closeSession] = await getSessionForTable('users')
 
   const result = await userTable
     .select(['id', 'email', 'name', 'last_name', 'username', 'user_type', 'active'])
@@ -22,7 +22,7 @@ usersRouter.get('/', async (req, res) => {
 })
 
 usersRouter.get('/:email', async (req, res) => {
-  const [userTable, closeSession] = await getSessionForTable('user')
+  const [userTable, closeSession] = await getSessionForTable('users')
   const requestedEmail = req.params.email
 
   const result = await userTable
@@ -49,10 +49,10 @@ usersRouter.post('/', userValidation, async (req, res) => {
     return res.status(422).json({ errors })
   }
 
-  const [userTable, closeSession] = await getSessionForTable('user')
+  const [userTable, closeSession] = await getSessionForTable('users')
 
   const existingUser = await userTable
-    .select()
+    .select(['id', 'email', 'name', 'last_name', 'username', 'user_type', 'active'])
     .where('username like :username || email like :email')
     .bind('email', email)
     .bind('username', username)
