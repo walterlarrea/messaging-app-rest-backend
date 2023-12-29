@@ -10,7 +10,8 @@
 		"lint": "eslint .",
 		"test": "node --test --env-file=.env.test",
 		"format:check": "prettier --check *.js src/**/*.js",
-		"format:write": "prettier --write *.js src/**/*.js"
+		"format:write": "prettier --write *.js src/**/*.js",
+		"prepare": "husky install"
 	},
 	"author": "walter larrea",
 	"license": "ISC",

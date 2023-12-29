@@ -7,9 +7,9 @@ import getSessionForTable from '../utils/mySqlConnection.js'
 const channelsRouter = Router()
 
 channelsRouter.post('/', channelValidation, async (req, res) => {
-	const { name , description, owner_id } = req.body
+	const { name, description, owner_id } = req.body
 
-	const { errors  } = validationResult(req)
+	const { errors } = validationResult(req)
 	if (errors.length > 0) {
 		return res.status(422).json({ errors })
 	}
@@ -29,10 +29,10 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 	}
 
 	const channelCreated = await channelTable
-	  .insert(['name', 'description', 'owner_id'])
+		.insert(['name', 'description', 'owner_id'])
 		.values([name, description, owner_id])
 		.execute()
-		 .catch()
+		.catch()
 
 	closeSession()
 	res.status(201).json({
