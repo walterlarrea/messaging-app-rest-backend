@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import usersRouter from './controllers/users.js'
+import loginRouter from './controllers/login.js'
 
 const app = express()
 
@@ -12,9 +13,6 @@ app.get('/', (request, response) => {
 })
 
 app.use('/api/user', usersRouter)
-
-app.get('/api/login', (request, response) => {
-  response.json({ LOGIN: 'endpoint' })
-})
+app.use('/api/login', loginRouter)
 
 export default app
