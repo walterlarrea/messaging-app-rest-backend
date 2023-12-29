@@ -1,5 +1,7 @@
 const SERVER_PORT = process.env.SERVER_PORT
 
+const JWT_SECRET = process.env.JWT_SECRET
+
 const MYSQL_URI = process.env.MYSQL_URI
 const MYSQL_PORT = process.env.MYSQL_PORT
 const MYSQL_USER = process.env.MYSQL_USER
@@ -12,6 +14,7 @@ const MYSQL_DATABASE = process.env.MYSQL_DATABASE
 
 export default {
   SERVER_PORT,
+  JWT_SECRET,
   MYSQL_URI,
   MYSQL_PORT,
   MYSQL_USER,
