@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { compare } from 'bcrypt'
 import { Router } from 'express'
-import config from '../utils/config.js'
+import { JWT_SECRET } from '../constants/config.js'
 import { getDatabaseTable } from '../utils/mySqlConnection.js'
 import { responseFormatter } from '../utils/mySqlHelper.js'
 
@@ -53,7 +53,7 @@ loginRouter.post('/', async (req, res) => {
 		id: user.id,
 	}
 
-	const token = jwt.sign(userForToken, config.JWT_SECRET, {
+	const token = jwt.sign(userForToken, JWT_SECRET, {
 		expiresIn: 60 * 60,
 	})
 
