@@ -1,16 +1,17 @@
-import { describe, it, before, beforeEach } from 'node:test'
+import { describe, it, before, beforeEach, after } from 'node:test'
 import assert from 'node:assert'
 import supertest from 'supertest'
 import app from '../../../app.js'
 import { getDatabase } from '../../utils/mySqlConnection.js'
 import { initialUsers, initialChannels } from './initial_data.js'
+import { responseFormatter } from '../../utils/mySqlHelper.js'
 
 const api = supertest(app)
 const [dbConnection] = await getDatabase()
 const userTable = dbConnection.getTable('users')
 const channelTable = dbConnection.getTable('channels')
 
-describe('Retrieve of users data', async () => {
+describe('Retrieve all users data', async () => {
 	before(async () => {
 		await userTable.delete().where('id').execute()
 
@@ -55,6 +56,7 @@ describe('Retrieve of users data', async () => {
 	it('gets all registered users', async () => {
 		const response = await api.get('/api/user')
 
+		assert.strictEqual(response.status, 200)
 		assert.equal(response.body.length, 2)
 	})
 })
@@ -85,59 +87,78 @@ describe('Registering new users', async () => {
 		})
 		const newUserId = testUserResponse?.body?.userId
 
-		const response = await userTable
-			.select()
-			.where('id = :id')
-			.bind('id', newUserId)
-			.execute()
+		const response = await userTable.select().execute()
 
-		assert.strictEqual(response.fetchOne()[0], newUserId)
+		const resultData = response.fetchAll()
+		const columnHeaders = response
+			.getColumns()
+			.map((col) => col.getColumnName())
+
+		const createdUser = responseFormatter(columnHeaders, resultData).filter(
+			(user) => user.id === newUserId
+		)
+
+		assert.strictEqual(testUserResponse.status, 201)
+		assert(newUserId > 0)
+		assert(createdUser[0])
 	})
 
 	it('fails if email is not provided', async () => {
 		const testUser = initialUsers[0]
-		const postResponse = await api.post('/api/user').send({
+		const testUserResponse = await api.post('/api/user').send({
 			name: testUser.name,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
 
-		const response = await userTable
-			.select()
-			.where('username = :username')
-			.bind('username', initialUsers[0].username)
-			.execute()
+		const response = await userTable.select().execute()
 
-		assert.strictEqual(postResponse.status, 422)
-		assert.strictEqual(response.fetchOne(), undefined)
+		const resultData = response.fetchAll()
+		const columnHeaders = response
+			.getColumns()
+			.map((col) => col.getColumnName())
+
+		const createdUser = responseFormatter(columnHeaders, resultData).find(
+			(user) => user.username === testUser.username
+		)
+
+		assert.strictEqual(testUserResponse.status, 422)
+		assert.ifError(createdUser)
 	})
 
 	it('fails if username is not provided', async () => {
 		const testUser = initialUsers[0]
-		const postResponse = await api.post('/api/user').send({
+		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
 			name: testUser.name,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
 
-		const response = await userTable
-			.select()
-			.where('email = :email')
-			.bind('email', testUser.email)
-			.execute()
+		const response = await userTable.select().execute()
 
-		assert.strictEqual(postResponse.status, 422)
-		assert.strictEqual(response.fetchOne(), undefined)
+		const resultData = response.fetchAll()
+		const columnHeaders = response
+			.getColumns()
+			.map((col) => col.getColumnName())
+
+		const createdUser = responseFormatter(columnHeaders, resultData).find(
+			(user) => user.email === testUser.email
+		)
+
+		assert.strictEqual(testUserResponse.status, 422)
+		assert.ifError(createdUser)
 	})
 
 	it('fails if email is already registered', async () => {
 		const testUser = initialUsers[1]
-		const postResponse = await api.post('/api/user').send({
+		const testUsername = 'test' + testUser.username
+
+		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
 			name: testUser.name,
-			username: 'u' + testUser.username,
+			username: testUsername,
 			// Creating different username to keep test on email only
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -145,14 +166,25 @@ describe('Registering new users', async () => {
 
 		const response = await userTable.select().execute()
 
-		assert.strictEqual(postResponse.status, 400)
-		assert.strictEqual(response.fetchAll().length, 1)
+		const resultData = response.fetchAll()
+		const columnHeaders = response
+			.getColumns()
+			.map((col) => col.getColumnName())
+
+		const createdUser = responseFormatter(columnHeaders, resultData).find(
+			(user) => user.username === testUsername
+		)
+
+		assert.strictEqual(testUserResponse.status, 400)
+		assert.ifError(createdUser)
 	})
 
 	it('fails if username is already registered', async () => {
 		const testUser = initialUsers[1]
-		const postResponse = await api.post('/api/user').send({
-			email: 'u' + testUser.email,
+		const testEmail = 'test' + testUser.email
+
+		const testUserResponse = await api.post('/api/user').send({
+			email: testEmail,
 			// Creating different email to keep test on username only
 			name: testUser.name,
 			username: testUser.username,
@@ -161,9 +193,17 @@ describe('Registering new users', async () => {
 		})
 
 		const response = await userTable.select().execute()
+		const resultData = response.fetchAll()
+		const columnHeaders = response
+			.getColumns()
+			.map((col) => col.getColumnName())
 
-		assert.strictEqual(postResponse.status, 400)
-		assert.strictEqual(response.fetchAll().length, 1)
+		const createdUser = responseFormatter(columnHeaders, resultData).find(
+			(user) => user.email === testEmail
+		)
+
+		assert.strictEqual(testUserResponse.status, 400)
+		assert.ifError(createdUser)
 	})
 })
 
@@ -193,6 +233,8 @@ describe('Login user', async () => {
 
 		const { token, name, username } = testUserResponse.body ?? {}
 
+		assert.strictEqual(testUserResponse.status, 200)
+		assert.match(testUserResponse.headers['content-type'], /application\/json/)
 		assert(token)
 		assert(name)
 		assert(username)
@@ -217,7 +259,7 @@ describe('Creating new channels', async () => {
 		})
 		const newUserId = userResponse._body.userId
 
-		assert(newUserId)
+		assert(newUserId > 0)
 
 		const testChannel = initialChannels[0]
 		const testChannelResponse = await api.post('/api/channel').send({
@@ -225,16 +267,27 @@ describe('Creating new channels', async () => {
 			description: testChannel.description,
 			owner_id: newUserId,
 		})
-		const newChannelId = testChannelResponse?.body?.channelId
 
-		const response = await channelTable
-			.select()
-			.where('id = :id')
-			.bind('id', newChannelId)
-			.execute()
+		const response = await channelTable.select().execute()
 
-		assert.strictEqual(response.fetchOne()[0], newChannelId)
+		const resultData = response.fetchAll()
+		const columnHeaders = response
+			.getColumns()
+			.map((col) => col.getColumnName())
 
+		const createdChannel = responseFormatter(columnHeaders, resultData).find(
+			(channel) => channel.description === testChannel.description
+		)
+
+		assert.strictEqual(testChannelResponse.status, 201)
+		assert.match(
+			testChannelResponse.headers['content-type'],
+			/application\/json/
+		)
+		assert(createdChannel)
+	})
+
+	after(async () => {
 		await channelTable.delete().where('id').execute()
 	})
 })
