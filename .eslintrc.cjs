@@ -14,7 +14,7 @@ module.exports = {
 			},
 		},
 	],
-	extends: 'eslint:recommended',
+	extends: ['eslint:recommended', 'prettier'],
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',

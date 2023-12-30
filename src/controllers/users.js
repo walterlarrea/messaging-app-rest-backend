@@ -53,9 +53,7 @@ usersRouter.get('/:email', async (req, res) => {
 	closeSession()
 	user
 		? res.json(user)
-		: res.status(404).json({
-				error: 'user not found on the platform',
-			})
+		: res.status(404).json({ error: 'user not found on the platform' })
 })
 
 usersRouter.post('/', userValidation, async (req, res) => {
