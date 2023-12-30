@@ -8,11 +8,9 @@ export const getSession = async function () {
 	return [myDb, mySession.close]
 }
 
-const getSessionForTable = async function (table) {
+export const getSessionForTable = async function (table) {
 	const mySession = await mysqlx.getSession(mysqlConfig)
 	const myDb = mySession.getSchema(mysqlConfig.schema)
 
 	return [myDb.getTable(table), mySession.close]
 }
-
-export default getSessionForTable

@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { compare } from 'bcrypt'
 import { Router } from 'express'
 import config from '../utils/config.js'
-import getSessionForTable from '../utils/mySqlConnection.js'
+import { getSessionForTable } from '../utils/mySqlConnection.js'
 import { responseFormatter } from '../utils/mySqlHelper.js'
 
 const loginRouter = Router()

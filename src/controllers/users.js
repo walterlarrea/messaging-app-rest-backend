@@ -2,7 +2,7 @@ import { hash } from 'bcrypt'
 import { Router } from 'express'
 import { validationResult } from 'express-validator'
 import userValidation from '../validators/userValidation.js'
-import getSessionForTable from '../utils/mySqlConnection.js'
+import { getSessionForTable } from '../utils/mySqlConnection.js'
 import { responseFormatter } from '../utils/mySqlHelper.js'
 
 const usersRouter = Router()

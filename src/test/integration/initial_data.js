@@ -17,18 +17,18 @@ export const initialUsers = [
 
 export const initialChannels = [
 	{
-		name: 'Minecraft',
+		name: 'Minecraft vanilla',
 		description: 'Talk about minecraft vanilla',
-		ownerId: 0,
+		ownerId: 1,
 	},
 	{
-		name: 'Factorio',
+		name: 'Factorio free for all',
 		description: 'Share bases, mods, and blueprints',
-		ownerId: 0,
+		ownerId: 2,
 	},
 	{
 		name: 'Serious things',
 		description: 'Talk about family problems',
-		ownerId: 0,
+		ownerId: 3,
 	},
 ]
