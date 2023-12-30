@@ -7,7 +7,7 @@
 	"scripts": {
 		"start": "node --env-file=.env.production index.js",
 		"dev": "nodemon --env-file=.env.development index.js",
-		"lint": "eslint .",
+		"lint": "eslint *.js src/**/*.js",
 		"test": "node --test --env-file=.env.test",
 		"format:check": "prettier --check *.js src/**/*.js",
 		"format:write": "prettier --write *.js src/**/*.js",
@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"eslint": "^8.56.0",
+		"eslint-config-prettier": "^9.1.0",
 		"husky": "^8.0.3",
 		"lint-staged": "^15.2.0",
 		"nodemon": "^3.0.2",
