@@ -2,11 +2,13 @@ import { describe, it, before, beforeEach } from 'node:test'
 import assert from 'node:assert'
 import supertest from 'supertest'
 import app from '../../../app.js'
-import getSessionForTable from '../../utils/mySqlConnection.js'
-import { initialUsers, initialChannels } from './test_initial_data.js'
+import { getSession } from '../../utils/mySqlConnection.js'
+import { initialUsers, initialChannels } from './initial_data.js'
 
 const api = supertest(app)
-const [userTable] = await getSessionForTable('users')
+const [dbConnection] = await getSession()
+const userTable = dbConnection.getTable('users')
+const channelTable = dbConnection.getTable('channels')
 
 describe('Retrieve of users data', async () => {
 	before(async () => {
@@ -198,26 +200,41 @@ describe('Login user', async () => {
 })
 
 describe('Creating new channels', async () => {
-	// before(async () => {
-
-	// })
+	before(async () => {
+		await userTable.delete().where('id').execute()
+		await channelTable.delete().where('id').execute()
+	})
 
 	it('succeeds providing only name, description & owner ID', async () => {
+		const testUser = initialUsers[0]
+
+		const userResponse = await api.post('/api/user').send({
+			email: testUser.email,
+			name: testUser.name,
+			username: testUser.username,
+			password: testUser.password,
+			password_confirm: testUser.password,
+		})
+		const newUserId = userResponse._body.userId
+
+		assert(newUserId)
+
 		const testChannel = initialChannels[0]
 		const testChannelResponse = await api.post('/api/channel').send({
 			name: testChannel.name,
 			description: testChannel.description,
-			owner_id: testChannel.ownerId,
+			owner_id: newUserId,
 		})
-
 		const newChannelId = testChannelResponse?.body?.channelId
 
-		const response = await userTable
+		const response = await channelTable
 			.select()
 			.where('id = :id')
 			.bind('id', newChannelId)
 			.execute()
 
 		assert.strictEqual(response.fetchOne()[0], newChannelId)
+
+		await channelTable.delete().where('id').execute()
 	})
 })
