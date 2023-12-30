@@ -2,11 +2,11 @@ import { describe, it, before, beforeEach } from 'node:test'
 import assert from 'node:assert'
 import supertest from 'supertest'
 import app from '../../../app.js'
-import { getSession } from '../../utils/mySqlConnection.js'
+import { getDatabase } from '../../utils/mySqlConnection.js'
 import { initialUsers, initialChannels } from './initial_data.js'
 
 const api = supertest(app)
-const [dbConnection] = await getSession()
+const [dbConnection] = await getDatabase()
 const userTable = dbConnection.getTable('users')
 const channelTable = dbConnection.getTable('channels')
 
