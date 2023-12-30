@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { compare } from 'bcrypt'
 import { Router } from 'express'
 import config from '../utils/config.js'
-import { getSessionForTable } from '../utils/mySqlConnection.js'
+import { getDatabaseTable } from '../utils/mySqlConnection.js'
 import { responseFormatter } from '../utils/mySqlHelper.js'
 
 const loginRouter = Router()
@@ -10,7 +10,7 @@ const loginRouter = Router()
 loginRouter.post('/', async (req, res) => {
 	const { email, password } = req.body
 
-	const [userTable, closeSession] = await getSessionForTable('users')
+	const [userTable, closeSession] = await getDatabaseTable('users')
 
 	const response = await userTable
 		.select([

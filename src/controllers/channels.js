@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { validationResult } from 'express-validator'
 import channelValidation from '../validators/channelValidation.js'
-import { getSessionForTable } from '../utils/mySqlConnection.js'
+import { getDatabaseTable } from '../utils/mySqlConnection.js'
 // import { responseFormatter } from '../utils/mySqlHelper.js'
 
 const channelsRouter = Router()
@@ -14,7 +14,7 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 		return res.status(422).json({ errors })
 	}
 
-	const [channelTable, closeSession] = await getSessionForTable('channels')
+	const [channelTable, closeSession] = await getDatabaseTable('channels')
 
 	const existingChannel = await channelTable
 		.select()

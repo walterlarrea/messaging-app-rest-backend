@@ -1,6 +1,6 @@
 import app from './app.js'
 import http from 'http'
-import config from './utils/config.js'
+import config from './src/utils/config.js'
 
 const server = http.createServer(app)
 

@@ -2,13 +2,13 @@ import { hash } from 'bcrypt'
 import { Router } from 'express'
 import { validationResult } from 'express-validator'
 import userValidation from '../validators/userValidation.js'
-import { getSessionForTable } from '../utils/mySqlConnection.js'
+import { getDatabaseTable } from '../utils/mySqlConnection.js'
 import { responseFormatter } from '../utils/mySqlHelper.js'
 
 const usersRouter = Router()
 
 usersRouter.get('/', async (req, res) => {
-	const [userTable, closeSession] = await getSessionForTable('users')
+	const [userTable, closeSession] = await getDatabaseTable('users')
 
 	const result = await userTable
 		.select([
@@ -30,7 +30,7 @@ usersRouter.get('/', async (req, res) => {
 })
 
 usersRouter.get('/:email', async (req, res) => {
-	const [userTable, closeSession] = await getSessionForTable('users')
+	const [userTable, closeSession] = await getDatabaseTable('users')
 	const requestedEmail = req.params.email
 
 	const result = await userTable
@@ -64,7 +64,7 @@ usersRouter.post('/', userValidation, async (req, res) => {
 		return res.status(422).json({ errors })
 	}
 
-	const [userTable, closeSession] = await getSessionForTable('users')
+	const [userTable, closeSession] = await getDatabaseTable('users')
 
 	const existingUser = await userTable
 		.select([
