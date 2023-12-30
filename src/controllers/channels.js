@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { validationResult } from 'express-validator'
 import channelValidation from '../validators/channelValidation.js'
-import getSessionForTable from '../utils/mySqlConnection.js'
-import { responseFormatter } from '../utils/mySqlHelper.js'
+import { getSessionForTable } from '../utils/mySqlConnection.js'
+// import { responseFormatter } from '../utils/mySqlHelper.js'
 
 const channelsRouter = Router()
 
@@ -35,8 +35,8 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 		.catch()
 
 	closeSession()
-	res.status(201).json({
-		channelId: 2000, //channelCreated.getAutoIncrementValue()
+	return res.status(201).json({
+		channelId: channelCreated.getAutoIncrementValue(),
 	})
 })
 
