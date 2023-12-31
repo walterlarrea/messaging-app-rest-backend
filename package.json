@@ -11,7 +11,9 @@
 		"test": "node --test --env-file=.env.test",
 		"format:check": "prettier --check *.js src/**/*.js",
 		"format:write": "prettier --write *.js src/**/*.js",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"db:generate": "drizzle-kit generate:mysql",
+		"db:deploy": "node --env-file=.env.test src/db/migrator.js"
 	},
 	"author": "walter larrea",
 	"license": "ISC",
@@ -19,11 +21,14 @@
 		"@mysql/xdevapi": "^8.0.35",
 		"bcrypt": "^5.1.1",
 		"cors": "^2.8.5",
+		"drizzle-orm": "^0.29.2",
 		"express": "^4.18.2",
 		"express-validator": "^7.0.1",
-		"jsonwebtoken": "^9.0.2"
+		"jsonwebtoken": "^9.0.2",
+		"mysql2": "^3.6.5"
 	},
 	"devDependencies": {
+		"drizzle-kit": "^0.20.9",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"husky": "^8.0.3",
