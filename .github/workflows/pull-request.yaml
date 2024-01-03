@@ -1,5 +1,5 @@
-name: Pull Requests
-run-name: pull request checking
+name: Test and Build
+run-name: New changes pushed by @${{ github.actor }}, starting new pipeline process 🚀
 on:
   pull_request:
     branches:
