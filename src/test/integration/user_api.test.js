@@ -69,7 +69,7 @@ describe('Registering new users', async () => {
 
 		await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.firstName,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -80,7 +80,7 @@ describe('Registering new users', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.firstName,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -106,7 +106,7 @@ describe('Registering new users', async () => {
 	it('fails if email is not provided', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/api/user').send({
-			name: testUser.firstName,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -131,7 +131,7 @@ describe('Registering new users', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.firstName,
+			first_name: testUser.firstName,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
@@ -157,7 +157,7 @@ describe('Registering new users', async () => {
 
 		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.firstName,
+			first_name: testUser.firstName,
 			username: testUsername,
 			// Creating different username to keep test on email only
 			password: testUser.password,
@@ -186,7 +186,7 @@ describe('Registering new users', async () => {
 		const testUserResponse = await api.post('/api/user').send({
 			email: testEmail,
 			// Creating different email to keep test on username only
-			name: testUser.firstName,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -263,7 +263,7 @@ describe('Creating new channels', async () => {
 
 		const testChannel = initialChannels[0]
 		const testChannelResponse = await api.post('/api/channel').send({
-			name: testChannel.name,
+			title: testChannel.title,
 			description: testChannel.description,
 			owner_id: newUserId,
 		})

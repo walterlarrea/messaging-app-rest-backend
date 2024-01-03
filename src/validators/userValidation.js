@@ -23,15 +23,15 @@ const userValidation = checkSchema({
 		},
 		errorMessage: 'Invalid username',
 	},
-	name: {
+	first_name: {
 		notEmpty: {
-			errorMessage: 'A name is required',
+			errorMessage: 'A first name is required',
 		},
 		isLength: {
 			options: { min: 3, max: 20 },
 			errorMessage: 'Must have between 3 and 20 characters',
 		},
-		errorMessage: 'Invalid name',
+		errorMessage: 'Invalid first name',
 	},
 	last_name: {
 		optional: true,
@@ -64,7 +64,7 @@ const userValidation = checkSchema({
 		isIn: ['user', 'administrator', 'manager'],
 		errorMessage: 'Must be one of user, administrator, or manager',
 	},
-	active: {
+	status: {
 		optional: true,
 		isIn: ['inactive', 'active', 'deleted'],
 		errorMessage: 'Must be one of inactive, active, or deleted',
