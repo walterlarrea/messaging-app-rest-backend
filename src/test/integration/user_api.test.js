@@ -18,16 +18,16 @@ describe('Retrieve all users data', async () => {
 		await userTable
 			.insert([
 				'email',
-				'name',
+				'first_name',
 				'last_name',
 				'username',
 				'password',
 				'user_type',
-				'active',
+				'status',
 			])
 			.values([
 				initialUsers[0].email,
-				initialUsers[0].name,
+				initialUsers[0].firstName,
 				initialUsers[0].lastName || '',
 				initialUsers[0].username,
 				initialUsers[0].password,
@@ -36,7 +36,7 @@ describe('Retrieve all users data', async () => {
 			])
 			.values([
 				initialUsers[1].email,
-				initialUsers[1].name,
+				initialUsers[1].firstName,
 				initialUsers[1].lastName || '',
 				initialUsers[1].username,
 				initialUsers[1].password,
@@ -69,7 +69,7 @@ describe('Registering new users', async () => {
 
 		await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.name,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -80,7 +80,7 @@ describe('Registering new users', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.name,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -106,7 +106,7 @@ describe('Registering new users', async () => {
 	it('fails if email is not provided', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/api/user').send({
-			name: testUser.name,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -131,7 +131,7 @@ describe('Registering new users', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.name,
+			first_name: testUser.firstName,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
@@ -157,7 +157,7 @@ describe('Registering new users', async () => {
 
 		const testUserResponse = await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.name,
+			first_name: testUser.firstName,
 			username: testUsername,
 			// Creating different username to keep test on email only
 			password: testUser.password,
@@ -186,7 +186,7 @@ describe('Registering new users', async () => {
 		const testUserResponse = await api.post('/api/user').send({
 			email: testEmail,
 			// Creating different email to keep test on username only
-			name: testUser.name,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -217,7 +217,7 @@ describe('Login user', async () => {
 
 		await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.name,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -231,12 +231,12 @@ describe('Login user', async () => {
 			password: testUser.password,
 		})
 
-		const { token, name, username } = testUserResponse.body ?? {}
+		const { token, firstName, username } = testUserResponse.body ?? {}
 
 		assert.strictEqual(testUserResponse.status, 200)
 		assert.match(testUserResponse.headers['content-type'], /application\/json/)
 		assert(token)
-		assert(name)
+		assert(firstName)
 		assert(username)
 	})
 })
@@ -252,7 +252,7 @@ describe('Creating new channels', async () => {
 
 		const userResponse = await api.post('/api/user').send({
 			email: testUser.email,
-			name: testUser.name,
+			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
@@ -263,7 +263,7 @@ describe('Creating new channels', async () => {
 
 		const testChannel = initialChannels[0]
 		const testChannelResponse = await api.post('/api/channel').send({
-			name: testChannel.name,
+			title: testChannel.title,
 			description: testChannel.description,
 			owner_id: newUserId,
 		})

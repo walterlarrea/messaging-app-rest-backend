@@ -7,7 +7,7 @@ import { getDatabaseTable } from '../utils/mySqlConnection.js'
 const channelsRouter = Router()
 
 channelsRouter.post('/', channelValidation, async (req, res) => {
-	const { name, description, owner_id } = req.body
+	const { title, description, owner_id } = req.body
 
 	const { errors } = validationResult(req)
 	if (errors.length > 0) {
@@ -18,19 +18,19 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 
 	const existingChannel = await channelTable
 		.select()
-		.where('name like :name')
-		.bind('name', name)
+		.where('title like :title')
+		.bind('title', title)
 		.execute()
 
 	if (existingChannel.fetchAll().length > 0) {
 		return res.status(400).json({
-			errors: [{ msg: 'A channel with the name provided already exists' }],
+			errors: [{ msg: 'A channel with the title provided already exists' }],
 		})
 	}
 
 	const channelCreated = await channelTable
-		.insert(['name', 'description', 'owner_id'])
-		.values([name, description, owner_id])
+		.insert(['title', 'description', 'owner_id'])
+		.values([title, description, owner_id])
 		.execute()
 		.catch()
 

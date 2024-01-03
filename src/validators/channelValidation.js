@@ -1,15 +1,15 @@
 import { checkSchema } from 'express-validator'
 
 const channelValidation = checkSchema({
-	name: {
+	title: {
 		notEmpty: {
-			errorMessage: 'A channel name is required',
+			errorMessage: 'A channel title is required',
 		},
 		isLength: {
 			options: { min: 10, max: 50 },
 			errorMessage: 'Must have between 10 and 50 characters',
 		},
-		errorMessage: 'Invalid name',
+		errorMessage: 'Invalid title',
 	},
 	description: {
 		notEmpty: {
