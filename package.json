@@ -8,7 +8,7 @@
 		"start": "node --env-file=.env.production index.js",
 		"dev": "nodemon --env-file=.env.development index.js",
 		"lint": "eslint *.js src/**/*.js",
-		"test": "node --test --env-file=.env.test",
+		"test": "node --test --env-file=.env.test src/test/**/*.test.*",
 		"format:check": "prettier --check *.js src/**/*.js",
 		"format:write": "prettier --write *.js src/**/*.js",
 		"prepare": "husky install",
