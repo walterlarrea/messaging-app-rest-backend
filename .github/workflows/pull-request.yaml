@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     services:
-      db:
+      mysql:
         image: mysql:8.0.30
         ports:
           - 33060
@@ -46,6 +46,9 @@ jobs:
       #   run: |
       #     sudo apt-get update
       #     sudo apt-get install libcurl4-openssl-dev libmysqlclient-dev libgirepository1.0-dev
+      - name: Wait for MySQL
+        run: |
+          timeout 60s bash -c 'until printf "." && nc -zv ${{ job.services.db.host }} ${{ job.services.db.ports[0] }}; do sleep 1; done'
       - name: Setup Node.js 20
         uses: actions/setup-node@v2
         with:
@@ -54,6 +57,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        env:
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_URI: ${{ secrets.MYSQL_URI }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
       - name: Migrate Database
         run: npm run db:deploy:test
       - name: Run tests
