@@ -34,6 +34,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
         options: >-
+          --name ${{ secrets.MYSQL_URI }}
           --health-cmd "mysqladmin ping"
           --health-interval 10s
           --health-timeout 5s
