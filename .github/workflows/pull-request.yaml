@@ -27,25 +27,26 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     services:
-      mysql:
+      db:
         image: mysql:8.0.30
+        ports:
+          - ${{secrets.MYSQL_PORT}}:${{secrets.MYSQL_PORT}}
         env:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-        ports:
-          - ${{secrets.MYSQL_PORT}}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         options: >-
-          --health-cmd "mysqladmin ping -ppass"
+          --health-cmd "mysqladmin ping"
           --health-interval 10s
-          --health-start-period 10s
           --health-timeout 5s
-          --health-retries 3
+          --health-retries 5
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Ubuntu dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install libcurl4-openssl-dev libmysqlclient-dev libgirepository1.0-dev
+      # - uses: actions/checkout@v3
+      # - name: Install Ubuntu dependencies
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install libcurl4-openssl-dev libmysqlclient-dev libgirepository1.0-dev
       - name: Setup Node.js 20
         uses: actions/setup-node@v2
         with:
