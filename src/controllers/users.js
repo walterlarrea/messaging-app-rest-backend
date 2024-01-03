@@ -14,11 +14,11 @@ usersRouter.get('/', async (req, res) => {
 		.select([
 			'id',
 			'email',
-			'name',
+			'first_name',
 			'last_name',
 			'username',
 			'user_type',
-			'active',
+			'status',
 		])
 		.execute()
 
@@ -37,11 +37,11 @@ usersRouter.get('/:email', async (req, res) => {
 		.select([
 			'id',
 			'email',
-			'name',
+			'first_name',
 			'last_name',
 			'username',
 			'user_type',
-			'active',
+			'status',
 		])
 		.where('email like :email')
 		.bind('email', requestedEmail)
@@ -57,7 +57,7 @@ usersRouter.get('/:email', async (req, res) => {
 })
 
 usersRouter.post('/', userValidation, async (req, res) => {
-	const { email, name, last_name, username, password } = req.body
+	const { email, first_name, last_name, username, password } = req.body
 
 	const { errors } = validationResult(req)
 	if (errors.length > 0) {
@@ -70,11 +70,11 @@ usersRouter.post('/', userValidation, async (req, res) => {
 		.select([
 			'id',
 			'email',
-			'name',
+			'first_name',
 			'last_name',
 			'username',
 			'user_type',
-			'active',
+			'status',
 		])
 		.where('username like :username || email like :email')
 		.bind('email', email)
@@ -93,16 +93,16 @@ usersRouter.post('/', userValidation, async (req, res) => {
 	const userCreated = await userTable
 		.insert([
 			'email',
-			'name',
+			'first_name',
 			'last_name',
 			'username',
 			'password',
 			'user_type',
-			'active',
+			'status',
 		])
 		.values([
 			email,
-			name,
+			first_name,
 			last_name || '',
 			username,
 			passwordHash,

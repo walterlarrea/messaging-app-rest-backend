@@ -16,12 +16,12 @@ loginRouter.post('/', async (req, res) => {
 		.select([
 			'id',
 			'email',
-			'name',
+			'first_name',
 			'last_name',
 			'username',
 			'password',
 			'user_type',
-			'active',
+			'status',
 		])
 		.where('email = :email')
 		.bind('email', email)
@@ -58,7 +58,9 @@ loginRouter.post('/', async (req, res) => {
 	})
 
 	closeSession()
-	res.status(200).send({ token, username: user.username, name: user.name })
+	res
+		.status(200)
+		.send({ token, username: user.username, firstName: user.first_name })
 })
 
 export default loginRouter
