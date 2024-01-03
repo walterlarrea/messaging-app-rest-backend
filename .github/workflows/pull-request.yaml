@@ -30,7 +30,7 @@ jobs:
       db:
         image: mysql:8.0.30
         ports:
-          - ${{secrets.MYSQL_PORT}}:${{secrets.MYSQL_PORT}}
+          - ${{ secrets.MYSQL_PORT }}
         env:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
