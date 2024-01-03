@@ -25,7 +25,7 @@ jobs:
   test:
     needs: lint
     environment: test
-        services:
+    services:
       mysql:
         image: mysql:8.0.30
         env:
