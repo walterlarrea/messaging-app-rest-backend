@@ -31,10 +31,8 @@ jobs:
         ports:
           - 33060
         env:
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_USER: ${{ secrets.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
         options: >-
           --health-cmd "mysqladmin ping"
           --health-interval 10s
@@ -42,13 +40,6 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v3
-      # - name: Install Ubuntu dependencies
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install libcurl4-openssl-dev libmysqlclient-dev libgirepository1.0-dev
-      - name: Wait for MySQL
-        run: |
-          timeout 60s bash -c 'until printf "." && nc -zv ${{ job.services.db.host }} ${{ job.services.db.ports[0] }}; do sleep 1; done'
       - name: Setup Node.js 20
         uses: actions/setup-node@v2
         with:
