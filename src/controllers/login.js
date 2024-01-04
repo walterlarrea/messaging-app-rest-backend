@@ -2,44 +2,41 @@ import jwt from 'jsonwebtoken'
 import { compare } from 'bcrypt'
 import { Router } from 'express'
 import { JWT_SECRET } from '../constants/config.js'
-import { getDatabaseTable } from '../utils/mySqlConnection.js'
-import { responseFormatter } from '../utils/mySqlHelper.js'
+import { getDatabase } from '../utils/mySqlConnection.js'
+import { UserSchema } from '../db/schema/user.schema.js'
+import { like } from 'drizzle-orm'
 
 const loginRouter = Router()
 
 loginRouter.post('/', async (req, res) => {
 	const { email, password } = req.body
 
-	const [userTable, closeSession] = await getDatabaseTable('users')
+	const [database] = await getDatabase()
 
-	const response = await userTable
-		.select([
-			'id',
-			'email',
-			'first_name',
-			'last_name',
-			'username',
-			'password',
-			'user_type',
-			'status',
-		])
-		.where('email = :email')
-		.bind('email', email)
-		.execute()
+	const result = await database
+		.select({
+			id: UserSchema.id,
+			email: UserSchema.email,
+			firstName: UserSchema.firstName,
+			lastName: UserSchema.lastName,
+			username: UserSchema.username,
+			password: UserSchema.password,
+			userType: UserSchema.userType,
+			status: UserSchema.status,
+		})
+		.from(UserSchema)
+		.where(like(UserSchema.email, email))
 
-	const foundUsers = response.fetchAll()
-
-	if (foundUsers.length === 0) {
+	if (result.length === 0) {
 		return res.status(400).json({ errors: [{ msg: 'Email not registered' }] })
 	}
-	if (foundUsers.length > 1) {
+	if (result.length > 1) {
 		return res
 			.status(400)
 			.json({ errors: [{ msg: 'An unexpected error ocurred' }] })
 	}
 
-	const columns = response.getColumns().map((col) => col.getColumnName())
-	const user = responseFormatter(columns, foundUsers)[0]
+	const user = result[0]
 
 	const passwordCorrect =
 		user === null ? false : await compare(password, user.password)
@@ -57,10 +54,10 @@ loginRouter.post('/', async (req, res) => {
 		expiresIn: 60 * 60,
 	})
 
-	closeSession()
+	// closeConnection()
 	res
 		.status(200)
-		.send({ token, username: user.username, firstName: user.first_name })
+		.send({ token, username: user.username, firstName: user.firstName })
 })
 
 export default loginRouter
