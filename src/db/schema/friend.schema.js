@@ -4,7 +4,7 @@ import {
 	bigint,
 	primaryKey,
 } from 'drizzle-orm/mysql-core'
-import { users } from './user.schema'
+import { users } from './user.schema.js'
 
 export const friends = mysqlTable(
 	'user_friends',
