@@ -37,7 +37,7 @@ jobs:
           MYSQL_USER: ${{ vars.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
         ports:
-          - 3307:3306
+          - '${{ vars.MYSQL_PORT }}:3306'
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
