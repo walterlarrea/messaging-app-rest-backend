@@ -46,10 +46,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Create env file
-        run: |
-          echo "${{ vars.TEST_DOT_ENV }}" > .env.test
-          echo "${{ vars.TEST_DOT_ENV }}" > .env
+        env:
+          SERVER_PORT: ${{ vars.SERVER_PORT }}
+          JWT_SECRET: ${{ vars.JWT_SECRET }}
+          MYSQL_URI: ${{ vars.MYSQL_URI }}
+          MYSQL_PORT: ${{ vars.MYSQL_PORT }}
+          MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ vars.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
       - name: Setup Node.js 20
         uses: actions/setup-node@v2
         with:
