@@ -5,6 +5,7 @@ import { migrate } from 'drizzle-orm/mysql2/migrator'
 import {
 	MYSQL_DATABASE,
 	MYSQL_PASSWORD,
+	MYSQL_PORT,
 	MYSQL_URI,
 	MYSQL_USER,
 } from '../constants/config.js'
@@ -13,6 +14,7 @@ const doMigrate = async () => {
 	try {
 		const dbConnection = await mysql.createConnection({
 			host: MYSQL_URI,
+			port: MYSQL_PORT,
 			user: MYSQL_USER,
 			password: MYSQL_PASSWORD,
 			database: MYSQL_DATABASE,
