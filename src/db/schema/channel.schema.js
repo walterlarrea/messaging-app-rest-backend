@@ -1,5 +1,5 @@
 import { serial, mysqlTable, varchar, bigint } from 'drizzle-orm/mysql-core'
-import { UserSchema } from './user.schema'
+import { UserSchema } from './user.schema.js'
 
 export const ChannelSchema = mysqlTable('channels', {
 	id: serial('id'),

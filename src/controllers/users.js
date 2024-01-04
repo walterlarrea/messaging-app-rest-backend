@@ -24,7 +24,6 @@ usersRouter.get('/', async (req, res) => {
 		})
 		.from(UserSchema)
 
-	console.log('NUEVO:', result)
 	// closeConnection()
 	res.json(result)
 })
