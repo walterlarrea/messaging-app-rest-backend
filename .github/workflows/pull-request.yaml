@@ -55,10 +55,9 @@ jobs:
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MYSQL_URI: ${{ secrets.MYSQL_URI }}
+          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
           SERVER_PORT: ${{ secrets.SERVER_PORT }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      - name: Show databases for User
-        run: mysql --protocol=tcp -h localhost -P 33060 -u ${{ secrets.MYSQL_USER }} -p ${{ secrets.MYSQL_PASSWORD }} -e "SHOW DATABASES"
       - name: Migrate Database
         run: npm run db:deploy:test
       - name: Run tests
