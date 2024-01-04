@@ -1,12 +1,12 @@
-name: Pull Requests
-run-name: pull request checking
+name: Pull Request lint & test
+run-name: New changes pushed by @${{ github.actor }}, starting new pipeline process 🚀
 on:
   pull_request:
     branches:
       - main
 
 jobs:
-  lint:
+  Lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,8 +22,8 @@ jobs:
       - name: Run linting
         run: npm run lint
 
-  test:
-    needs: lint
+  Integration-test:
+    needs: Lint
     runs-on: ubuntu-latest
     environment: test
     services:
@@ -51,7 +51,7 @@ jobs:
           cache: 'npm'
 
       - name: Create env
-        run: echo "DATABASE = ${{ secrets.ENV_DOT_TEST }}" > .env.test
+        run: echo "${{ secrets.ENV_DOT_TEST }}" > .env.test
 
       - name: Install dependencies
         run: npm install
