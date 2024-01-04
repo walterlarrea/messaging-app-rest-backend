@@ -11,6 +11,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    environment: test
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -36,9 +37,8 @@ jobs:
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
         ports:
-          - '${{ env.MYSQL_PORT }}:3306'
+          - '${{ vars.MYSQL_PORT }}:3306'
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
