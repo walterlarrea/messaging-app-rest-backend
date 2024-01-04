@@ -3,8 +3,7 @@ import { Router } from 'express'
 import { validationResult } from 'express-validator'
 import userValidation from '../validators/userValidation.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
-
-import { UserSchema } from '../db/schema/user.schema.js'
+import { users } from '../db/schema/user.schema.js'
 import { like, or, and } from 'drizzle-orm'
 
 const usersRouter = Router()
@@ -14,15 +13,15 @@ usersRouter.get('/', async (req, res) => {
 
 	const result = await database
 		.select({
-			id: UserSchema.id,
-			email: UserSchema.email,
-			firstName: UserSchema.firstName,
-			lastName: UserSchema.lastName,
-			username: UserSchema.username,
-			userType: UserSchema.userType,
-			status: UserSchema.status,
+			id: users.id,
+			email: users.email,
+			firstName: users.firstName,
+			lastName: users.lastName,
+			username: users.username,
+			userType: users.userType,
+			status: users.status,
 		})
-		.from(UserSchema)
+		.from(users)
 
 	// closeConnection()
 	res.json(result)
@@ -34,16 +33,16 @@ usersRouter.get('/:email', async (req, res) => {
 
 	const result = await database
 		.select({
-			id: UserSchema.id,
-			email: UserSchema.email,
-			firstName: UserSchema.firstName,
-			lastName: UserSchema.lastName,
-			username: UserSchema.username,
-			userType: UserSchema.userType,
-			status: UserSchema.status,
+			id: users.id,
+			email: users.email,
+			firstName: users.firstName,
+			lastName: users.lastName,
+			username: users.username,
+			userType: users.userType,
+			status: users.status,
 		})
-		.from(UserSchema)
-		.where(like(UserSchema.email, requestedEmail))
+		.from(users)
+		.where(like(users.email, requestedEmail))
 
 	// closeConnection()
 	result.length > 0
@@ -63,18 +62,16 @@ usersRouter.post('/', userValidation, async (req, res) => {
 
 	const existingUser = await database
 		.select({
-			id: UserSchema.id,
-			email: UserSchema.email,
-			firstName: UserSchema.firstName,
-			lastName: UserSchema.lastName,
-			username: UserSchema.username,
-			userType: UserSchema.userType,
-			status: UserSchema.status,
+			id: users.id,
+			email: users.email,
+			firstName: users.firstName,
+			lastName: users.lastName,
+			username: users.username,
+			userType: users.userType,
+			status: users.status,
 		})
-		.from(UserSchema)
-		.where(
-			or(like(UserSchema.email, email), like(UserSchema.username, username))
-		)
+		.from(users)
+		.where(or(like(users.email, email), like(users.username, username)))
 
 	if (existingUser.length > 0) {
 		return res.status(400).json({
@@ -85,7 +82,7 @@ usersRouter.post('/', userValidation, async (req, res) => {
 	const saltRounds = 10
 	const passwordHash = await hash(password, saltRounds)
 
-	await database.insert(UserSchema).values({
+	await database.insert(users).values({
 		email,
 		firstName: first_name,
 		lastName: last_name || '',
@@ -97,12 +94,10 @@ usersRouter.post('/', userValidation, async (req, res) => {
 
 	const userCreated = await database
 		.select({
-			userId: UserSchema.id,
+			userId: users.id,
 		})
-		.from(UserSchema)
-		.where(
-			and(like(UserSchema.email, email), like(UserSchema.username, username))
-		)
+		.from(users)
+		.where(and(like(users.email, email), like(users.username, username)))
 
 	// closeConnection()
 	res.status(201).json(userCreated[0])

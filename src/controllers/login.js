@@ -3,7 +3,7 @@ import { compare } from 'bcrypt'
 import { Router } from 'express'
 import { JWT_SECRET } from '../constants/config.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
-import { UserSchema } from '../db/schema/user.schema.js'
+import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
 const loginRouter = Router()
@@ -15,17 +15,17 @@ loginRouter.post('/', async (req, res) => {
 
 	const result = await database
 		.select({
-			id: UserSchema.id,
-			email: UserSchema.email,
-			firstName: UserSchema.firstName,
-			lastName: UserSchema.lastName,
-			username: UserSchema.username,
-			password: UserSchema.password,
-			userType: UserSchema.userType,
-			status: UserSchema.status,
+			id: users.id,
+			email: users.email,
+			firstName: users.firstName,
+			lastName: users.lastName,
+			username: users.username,
+			password: users.password,
+			userType: users.userType,
+			status: users.status,
 		})
-		.from(UserSchema)
-		.where(like(UserSchema.email, email))
+		.from(users)
+		.where(like(users.email, email))
 
 	if (result.length === 0) {
 		return res.status(400).json({ errors: [{ msg: 'Email not registered' }] })

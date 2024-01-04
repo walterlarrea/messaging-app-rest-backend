@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { validationResult } from 'express-validator'
 import channelValidation from '../validators/channelValidation.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
-import { ChannelSchema } from '../db/schema/channel.schema.js'
+import { channels } from '../db/schema/channel.schema.js'
 import { like } from 'drizzle-orm'
 
 const channelsRouter = Router()
@@ -10,7 +10,7 @@ const channelsRouter = Router()
 channelsRouter.get('/', async (req, res) => {
 	const [database] = await getDatabase()
 
-	const result = await database.select().from(ChannelSchema)
+	const result = await database.select().from(channels)
 
 	// closeConnection()
 	res.json(result)
@@ -28,8 +28,8 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 
 	const existingChannel = await database
 		.select()
-		.from(ChannelSchema)
-		.where(like(ChannelSchema.title, title))
+		.from(channels)
+		.where(like(channels.title, title))
 
 	if (existingChannel.length > 0) {
 		return res.status(400).json({
@@ -37,7 +37,7 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 		})
 	}
 
-	await database.insert(ChannelSchema).values({
+	await database.insert(channels).values({
 		title,
 		description,
 		ownerId: owner_id,
@@ -45,10 +45,10 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 
 	const channelCreated = await database
 		.select({
-			channelId: ChannelSchema.id,
+			channelId: channels.id,
 		})
-		.from(ChannelSchema)
-		.where(like(ChannelSchema.title, title))
+		.from(channels)
+		.where(like(channels.title, title))
 
 	// closeConnection()
 	return res.status(201).json(channelCreated[0])
