@@ -1,6 +1,5 @@
 name: Test and Build
 run-name: New changes pushed by @${{ github.actor }}, starting new pipeline process 🚀
-environment: test
 env:
   MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
   MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
@@ -34,6 +33,7 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
+    environment: test
     services:
       mysql:
         image: mysql:8.0.30
