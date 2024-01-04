@@ -37,7 +37,7 @@ jobs:
           MYSQL_USER: ${{ vars.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
         ports:
-          - 127.0.0.1:33060:3306
+          - 3307:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -52,7 +52,7 @@ jobs:
           MYSQL_URI: ${{ vars.MYSQL_URI }}
           MYSQL_PORT: ${{ vars.MYSQL_PORT }}
           MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
-          MYSQL_USER: root
+          MYSQL_USER: ${{ vars.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
       - name: Setup Node.js 20
         uses: actions/setup-node@v2
