@@ -15,7 +15,8 @@
 		"db:generate": "drizzle-kit generate:mysql",
 		"db:deploy:production": "node --env-file=.env.production src/db/migrator.js",
 		"db:deploy:development": "node --env-file=.env.development src/db/migrator.js",
-		"db:deploy:test": "node --env-file=.env.test src/db/migrator.js"
+		"db:deploy:test": "node --env-file=.env.test src/db/migrator.js",
+		"docker-setup": "docker compose up --wait && printf \"> Waiting for service to be up and running ...\" && sleep 10 && npm run db:deploy:test && npm run db:deploy:development"
 	},
 	"author": "walter larrea",
 	"license": "ISC",
