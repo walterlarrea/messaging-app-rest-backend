@@ -1,6 +1,6 @@
 import { serial, mysqlTable, varchar, mysqlEnum } from 'drizzle-orm/mysql-core'
 
-export const UserSchema = mysqlTable('users', {
+export const users = mysqlTable('users', {
 	id: serial('id'),
 	email: varchar('email', { length: 60 }).notNull(),
 	firstName: varchar('first_name', { length: 20 }).notNull(),
