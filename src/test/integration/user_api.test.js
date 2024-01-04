@@ -235,5 +235,8 @@ describe('Creating new channels', async () => {
 
 	after(async () => {
 		await database.delete(channels)
+
+		/// Force exit due to Test Runner not able to stop after all test are done
+		process.exit()
 	})
 })
