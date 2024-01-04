@@ -15,7 +15,7 @@
 		"db:generate": "drizzle-kit generate:mysql",
 		"db:deploy:production": "node --env-file=.env.production src/db/migrator.js",
 		"db:deploy:development": "node --env-file=.env.development src/db/migrator.js",
-		"db:deploy:test": "node --env-file=.env.test src/db/migrator.js"
+		"db:deploy:test": "node src/db/migrator.js"
 	},
 	"author": "walter larrea",
 	"license": "ISC",
