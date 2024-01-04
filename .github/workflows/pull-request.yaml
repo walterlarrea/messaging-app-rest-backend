@@ -64,6 +64,9 @@ jobs:
         run: |
           echo "DOTENV = ${{ vars.TEST_DOT_ENV }}"
           echo "DATABASE = ${{ env.MYSQL_DATABASE }}"
+          echo "DATABASE = ${{ vars.TEST_DOT_ENV }}" > .env.test
+          echo "DATABASE = ${{ env.MYSQL_DATABASE }}"
+
       - name: Install dependencies
         run: npm install
       - name: Migrate Database
