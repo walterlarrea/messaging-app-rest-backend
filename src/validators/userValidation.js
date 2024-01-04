@@ -61,12 +61,12 @@ const userValidation = checkSchema({
 	},
 	user_type: {
 		optional: true,
-		isIn: ['user', 'administrator', 'manager'],
+		isIn: { options: [['user', 'administrator', 'manager']] },
 		errorMessage: 'Must be one of user, administrator, or manager',
 	},
 	status: {
 		optional: true,
-		isIn: ['inactive', 'active', 'deleted'],
+		isIn: { options: [['inactive', 'active', 'deleted']] },
 		errorMessage: 'Must be one of inactive, active, or deleted',
 	},
 })
