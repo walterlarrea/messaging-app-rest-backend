@@ -1,19 +1,9 @@
 name: Test and Build
 run-name: New changes pushed by @${{ github.actor }}, starting new pipeline process 🚀
-env:
-  MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-  MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-  MYSQL_USER: ${{ secrets.MYSQL_USER }}
-  MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
-  MYSQL_URI: ${{ secrets.MYSQL_URI }}
-  MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
-  SERVER_PORT: ${{ secrets.SERVER_PORT }}
-  JWT_SECRET: ${{ secrets.JWT_SECRET }}
 on:
   pull_request:
     branches:
       - main
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -29,7 +19,6 @@ jobs:
         run: npm install
       - name: Run linting
         run: npm run lint
-
   test:
     needs: lint
     runs-on: ubuntu-latest
@@ -40,10 +29,10 @@ jobs:
         ports:
           - 33060
         env:
-          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_PASSWORD }}
-          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ env.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         options: >-
           --health-cmd "mysqladmin ping"
           --health-interval 10s
@@ -56,9 +45,16 @@ jobs:
         with:
           node-version: '20.x'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm install
+        env:
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_URI: mysql # ${{ secrets.MYSQL_URI }}
+          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
       - name: Migrate Database
         run: npm run db:deploy:test
       - name: Run tests
