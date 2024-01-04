@@ -11,7 +11,6 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    environment: test
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -29,6 +28,7 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
+    environment: test
     services:
       mysql:
         image: mysql:8.0.30
