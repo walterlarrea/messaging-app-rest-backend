@@ -1,22 +1,23 @@
-import mysqlx from '@mysql/xdevapi'
-import { sessionCredentials, databaseName } from './mysqlCredentials.js'
+import mysql from 'mysql2/promise'
+import { drizzle } from 'drizzle-orm/mysql2'
 
-export const getSession = async function () {
-	const mySession = await mysqlx.getSession(sessionCredentials)
-
-	return [mySession, mySession.close]
-}
+import {
+	MYSQL_DATABASE,
+	MYSQL_PASSWORD,
+	MYSQL_PORT,
+	MYSQL_URI,
+	MYSQL_USER,
+} from '../constants/config.js'
 
 export const getDatabase = async function () {
-	const mySession = await mysqlx.getSession(sessionCredentials)
-	const myDb = mySession.getSchema(databaseName)
+	const dbConnection = await mysql.createConnection({
+		host: MYSQL_URI,
+		port: MYSQL_PORT,
+		user: MYSQL_USER,
+		password: MYSQL_PASSWORD,
+		database: MYSQL_DATABASE,
+	})
+	const database = drizzle(dbConnection)
 
-	return [myDb, mySession.close]
-}
-
-export const getDatabaseTable = async function (table) {
-	const mySession = await mysqlx.getSession(sessionCredentials)
-	const myDb = mySession.getSchema(databaseName)
-
-	return [myDb.getTable(table), mySession.close]
+	return [database, dbConnection.end]
 }

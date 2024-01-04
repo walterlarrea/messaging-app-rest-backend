@@ -1,10 +1,20 @@
 import { Router } from 'express'
 import { validationResult } from 'express-validator'
 import channelValidation from '../validators/channelValidation.js'
-import { getDatabaseTable } from '../utils/mySqlConnection.js'
-// import { responseFormatter } from '../utils/mySqlHelper.js'
+import { getDatabase } from '../utils/mySqlConnection.js'
+import { channels } from '../db/schema/channel.schema.js'
+import { like } from 'drizzle-orm'
 
 const channelsRouter = Router()
+
+channelsRouter.get('/', async (req, res) => {
+	const [database] = await getDatabase()
+
+	const result = await database.select().from(channels)
+
+	// closeConnection()
+	res.json(result)
+})
 
 channelsRouter.post('/', channelValidation, async (req, res) => {
 	const { title, description, owner_id } = req.body
@@ -14,30 +24,34 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 		return res.status(422).json({ errors })
 	}
 
-	const [channelTable, closeSession] = await getDatabaseTable('channels')
+	const [database] = await getDatabase()
 
-	const existingChannel = await channelTable
+	const existingChannel = await database
 		.select()
-		.where('title like :title')
-		.bind('title', title)
-		.execute()
+		.from(channels)
+		.where(like(channels.title, title))
 
-	if (existingChannel.fetchAll().length > 0) {
+	if (existingChannel.length > 0) {
 		return res.status(400).json({
 			errors: [{ msg: 'A channel with the title provided already exists' }],
 		})
 	}
 
-	const channelCreated = await channelTable
-		.insert(['title', 'description', 'owner_id'])
-		.values([title, description, owner_id])
-		.execute()
-		.catch()
-
-	closeSession()
-	return res.status(201).json({
-		channelId: channelCreated.getAutoIncrementValue(),
+	await database.insert(channels).values({
+		title,
+		description,
+		ownerId: owner_id,
 	})
+
+	const channelCreated = await database
+		.select({
+			channelId: channels.id,
+		})
+		.from(channels)
+		.where(like(channels.title, title))
+
+	// closeConnection()
+	return res.status(201).json(channelCreated[0])
 })
 
 export default channelsRouter

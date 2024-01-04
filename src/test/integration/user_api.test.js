@@ -4,59 +4,43 @@ import supertest from 'supertest'
 import app from '../../../app.js'
 import { getDatabase } from '../../utils/mySqlConnection.js'
 import { initialUsers, initialChannels } from './initial_data.js'
-import { responseFormatter } from '../../utils/mySqlHelper.js'
+import { users } from '../../db/schema/user.schema.js'
+import { channels } from '../../db/schema/channel.schema.js'
 
 const api = supertest(app)
-const [dbConnection] = await getDatabase()
-const userTable = dbConnection.getTable('users')
-const channelTable = dbConnection.getTable('channels')
+const [database] = await getDatabase()
 
-describe('Retrieve all users data', async () => {
+describe('Retrieve users data', async () => {
 	before(async () => {
-		await userTable.delete().where('id').execute()
+		await database.delete(users)
 
-		await userTable
-			.insert([
-				'email',
-				'first_name',
-				'last_name',
-				'username',
-				'password',
-				'user_type',
-				'status',
-			])
-			.values([
-				initialUsers[0].email,
-				initialUsers[0].firstName,
-				initialUsers[0].lastName || '',
-				initialUsers[0].username,
-				initialUsers[0].password,
-				'user',
-				'inactive',
-			])
-			.values([
-				initialUsers[1].email,
-				initialUsers[1].firstName,
-				initialUsers[1].lastName || '',
-				initialUsers[1].username,
-				initialUsers[1].password,
-				'user',
-				'inactive',
-			])
-			.execute()
+		await database.insert(users).values([
+			{
+				email: initialUsers[0].email,
+				firstName: initialUsers[0].firstName,
+				lastName: initialUsers[0].lastName || '',
+				username: initialUsers[0].username,
+				password: initialUsers[0].password,
+				userType: 'user',
+				status: 'inactive',
+			},
+			{
+				email: initialUsers[1].email,
+				firstName: initialUsers[1].firstName,
+				lastName: initialUsers[1].lastName || '',
+				username: initialUsers[1].username,
+				password: initialUsers[1].password,
+				userType: 'user',
+				status: 'inactive',
+			},
+		])
 	})
 
-	it('returns users as json', async () => {
+	it('returns all registered users as json', async () => {
 		const response = await api.get('/api/user')
 
 		assert.strictEqual(response.status, 200)
 		assert.match(response.headers['content-type'], /application\/json/)
-	})
-
-	it('gets all registered users', async () => {
-		const response = await api.get('/api/user')
-
-		assert.strictEqual(response.status, 200)
 		assert.equal(response.body.length, 2)
 	})
 })
@@ -65,7 +49,7 @@ describe('Registering new users', async () => {
 	beforeEach(async () => {
 		const testUser = initialUsers[1]
 
-		await userTable.delete().where('id').execute()
+		await database.delete(users)
 
 		await api.post('/api/user').send({
 			email: testUser.email,
@@ -87,20 +71,13 @@ describe('Registering new users', async () => {
 		})
 		const newUserId = testUserResponse?.body?.userId
 
-		const response = await userTable.select().execute()
+		const result = await database.select().from(users)
 
-		const resultData = response.fetchAll()
-		const columnHeaders = response
-			.getColumns()
-			.map((col) => col.getColumnName())
-
-		const createdUser = responseFormatter(columnHeaders, resultData).filter(
-			(user) => user.id === newUserId
-		)
+		const createdUser = result.find((user) => user.id === newUserId)
 
 		assert.strictEqual(testUserResponse.status, 201)
 		assert(newUserId > 0)
-		assert(createdUser[0])
+		assert(createdUser)
 	})
 
 	it('fails if email is not provided', async () => {
@@ -112,14 +89,9 @@ describe('Registering new users', async () => {
 			password_confirm: testUser.password,
 		})
 
-		const response = await userTable.select().execute()
+		const result = await database.select().from(users)
 
-		const resultData = response.fetchAll()
-		const columnHeaders = response
-			.getColumns()
-			.map((col) => col.getColumnName())
-
-		const createdUser = responseFormatter(columnHeaders, resultData).find(
+		const createdUser = result.find(
 			(user) => user.username === testUser.username
 		)
 
@@ -136,16 +108,9 @@ describe('Registering new users', async () => {
 			password_confirm: testUser.password,
 		})
 
-		const response = await userTable.select().execute()
+		const result = await database.select().from(users)
 
-		const resultData = response.fetchAll()
-		const columnHeaders = response
-			.getColumns()
-			.map((col) => col.getColumnName())
-
-		const createdUser = responseFormatter(columnHeaders, resultData).find(
-			(user) => user.email === testUser.email
-		)
+		const createdUser = result.find((user) => user.email === testUser.email)
 
 		assert.strictEqual(testUserResponse.status, 422)
 		assert.ifError(createdUser)
@@ -164,16 +129,9 @@ describe('Registering new users', async () => {
 			password_confirm: testUser.password,
 		})
 
-		const response = await userTable.select().execute()
+		const result = await database.select().from(users)
 
-		const resultData = response.fetchAll()
-		const columnHeaders = response
-			.getColumns()
-			.map((col) => col.getColumnName())
-
-		const createdUser = responseFormatter(columnHeaders, resultData).find(
-			(user) => user.username === testUsername
-		)
+		const createdUser = result.find((user) => user.username === testUsername)
 
 		assert.strictEqual(testUserResponse.status, 400)
 		assert.ifError(createdUser)
@@ -192,15 +150,9 @@ describe('Registering new users', async () => {
 			password_confirm: testUser.password,
 		})
 
-		const response = await userTable.select().execute()
-		const resultData = response.fetchAll()
-		const columnHeaders = response
-			.getColumns()
-			.map((col) => col.getColumnName())
+		const result = await database.select().from(users)
 
-		const createdUser = responseFormatter(columnHeaders, resultData).find(
-			(user) => user.email === testEmail
-		)
+		const createdUser = result.find((user) => user.email === testEmail)
 
 		assert.strictEqual(testUserResponse.status, 400)
 		assert.ifError(createdUser)
@@ -213,7 +165,7 @@ describe('Login user', async () => {
 	before(async () => {
 		const testUser = initialUsers[0]
 
-		await userTable.delete().where('id').execute()
+		await database.delete(users)
 
 		await api.post('/api/user').send({
 			email: testUser.email,
@@ -243,8 +195,8 @@ describe('Login user', async () => {
 
 describe('Creating new channels', async () => {
 	before(async () => {
-		await userTable.delete().where('id').execute()
-		await channelTable.delete().where('id').execute()
+		await database.delete(channels) // channelTable.delete().where('id').execute()
+		await database.delete(users) // userTable.delete().where('id').execute()
 	})
 
 	it('succeeds providing only name, description & owner ID', async () => {
@@ -268,15 +220,9 @@ describe('Creating new channels', async () => {
 			owner_id: newUserId,
 		})
 
-		const response = await channelTable.select().execute()
-
-		const resultData = response.fetchAll()
-		const columnHeaders = response
-			.getColumns()
-			.map((col) => col.getColumnName())
-
-		const createdChannel = responseFormatter(columnHeaders, resultData).find(
-			(channel) => channel.description === testChannel.description
+		const result = await database.select().from(channels)
+		const createdChannel = result.find(
+			(channel) => channel.title === testChannel.title
 		)
 
 		assert.strictEqual(testChannelResponse.status, 201)
@@ -288,6 +234,6 @@ describe('Creating new channels', async () => {
 	})
 
 	after(async () => {
-		await channelTable.delete().where('id').execute()
+		await database.delete(channels)
 	})
 })
