@@ -46,26 +46,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        env:
-          SERVER_PORT: ${{ vars.SERVER_PORT }}
-          JWT_SECRET: ${{ vars.JWT_SECRET }}
-          MYSQL_URI: ${{ vars.MYSQL_URI }}
-          MYSQL_PORT: ${{ vars.MYSQL_PORT }}
-          MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
-          MYSQL_USER: ${{ vars.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ vars.MYSQL_PASSWORD }}
       - name: Setup Node.js 20
         uses: actions/setup-node@v2
         with:
           node-version: '20.x'
           cache: 'npm'
 
-      - name: TEST ENV
-        run: |
-          echo "DOTENV = ${{ vars.TEST_DOT_ENV }}"
-          echo "DATABASE = ${{ env.MYSQL_DATABASE }}"
-          echo "DATABASE = ${{ vars.TEST_DOT_ENV }}" > .env.test
-          echo "DATABASE = ${{ env.MYSQL_DATABASE }}"
+      - name: Create env
+        run: echo "DATABASE = ${{ vars.TEST_DOT_ENV }}" > .env.test
 
       - name: Install dependencies
         run: npm install
