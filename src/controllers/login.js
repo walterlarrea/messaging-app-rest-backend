@@ -28,12 +28,10 @@ loginRouter.post('/', async (req, res) => {
 		.where(like(users.email, email))
 
 	if (result.length === 0) {
-		return res.status(400).json({ errors: [{ msg: 'Email not registered' }] })
+		return res.status(400).json({ errors: ['Email not registered'] })
 	}
 	if (result.length > 1) {
-		return res
-			.status(400)
-			.json({ errors: [{ msg: 'An unexpected error ocurred' }] })
+		return res.status(400).json({ errors: ['An unexpected error ocurred'] })
 	}
 
 	const user = result[0]
@@ -42,7 +40,7 @@ loginRouter.post('/', async (req, res) => {
 		user === null ? false : await compare(password, user.password)
 
 	if (!(user && passwordCorrect)) {
-		return res.status(400).json({ error: 'invalid username or password' })
+		return res.status(400).json({ errors: ['invalid username or password'] })
 	}
 
 	const userForToken = {
