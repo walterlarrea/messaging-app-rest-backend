@@ -9,7 +9,7 @@ services:
     image: mysql:8.0.30
     container_name: messaging_app_mysql
     volumes:
-      - ./docker/provision/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/provision/mysql/init/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:

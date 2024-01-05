@@ -6,12 +6,13 @@
 .pnp.js
 
 # environment
-.env*
+.env
 .env.development
+.env.production
 .env.test
 
-# docker provision
-/docker
+# mysql deploy init scripts
+/docker/provision/mysql/init/init.sql
 
 # testing
 /coverage
