@@ -16,12 +16,11 @@
 		"db:deploy:production": "node --env-file=.env.production src/db/migrator.js",
 		"db:deploy:development": "node --env-file=.env.development src/db/migrator.js",
 		"db:deploy:test": "node --env-file=.env.test src/db/migrator.js",
-		"docker-setup": "docker compose up --wait && printf \"> Waiting for service to be up and running ...\" && sleep 10 && npm run db:deploy:test && npm run db:deploy:development"
+		"docker:setup": "docker compose --env-file=.env.test up --wait && printf \"> Waiting for service to be up and running ...\" && sleep 10 && npm run db:deploy:test && npm run db:deploy:development"
 	},
 	"author": "walter larrea",
 	"license": "ISC",
 	"dependencies": {
-		"@mysql/xdevapi": "^8.0.35",
 		"bcrypt": "^5.1.1",
 		"cors": "^2.8.5",
 		"drizzle-orm": "^0.29.2",
