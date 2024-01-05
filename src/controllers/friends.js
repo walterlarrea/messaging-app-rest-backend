@@ -4,6 +4,7 @@ import { Router } from 'express'
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { friends } from '../db/schema/friend.schema.js'
 import { and, eq, or } from 'drizzle-orm'
+import { users } from '../db/schema/user.schema.js'
 
 const friendsRouter = Router()
 
@@ -127,6 +128,15 @@ friendsRouter.post('/request', async (req, res) => {
 	}
 
 	const [database] = await getDatabase()
+
+	const [targetUser] = await database
+		.select()
+		.from(users)
+		.where(eq(users.id, target_user_id))
+
+	if (!targetUser || targetUser.status !== 'active') {
+		return res.status(400).send({ error: 'Target user is not valid' })
+	}
 
 	const existingFriendRequestFromUser = await database
 		.select()
