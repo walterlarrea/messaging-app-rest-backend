@@ -77,7 +77,7 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
-### 4. Configure the variables in `.env``.env.test`, `.env.development` and `.env.production`
+### 4. Configure the variables in `.env.test`, `.env.development` and `.env.production`
 
 ```
 SERVER_PORT= Api server port
