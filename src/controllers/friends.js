@@ -1,14 +1,19 @@
 import { Router } from 'express'
-import { validationResult } from 'express-validator'
-import friendRequestValidation from '../validators/friendReqValidation.js'
+// import { validationResult } from 'express-validator'
+// import friendRequestValidation from '../validators/friendReqValidation.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { friends } from '../db/schema/friend.schema.js'
 import { and, eq, or } from 'drizzle-orm'
+import { users } from '../db/schema/user.schema.js'
 
 const friendsRouter = Router()
 
-friendsRouter.get('/:id', async (req, res) => {
-	const userId = req.params.id
+friendsRouter.get('/', async (req, res) => {
+	if (!req.user?.id) {
+		return res.status(401).json({ error: 'token missing or invalid' })
+	}
+	const userId = req.user.id
+
 	const [database] = await getDatabase()
 
 	const results = await database
@@ -24,8 +29,12 @@ friendsRouter.get('/:id', async (req, res) => {
 	return res.status(200).send(results)
 })
 
-friendsRouter.get('/incoming-requests/:id', async (req, res) => {
-	const userId = req.params.id
+friendsRouter.get('/incoming-requests', async (req, res) => {
+	if (!req.user?.id) {
+		return res.status(401).json({ error: 'token missing or invalid' })
+	}
+	const userId = req.user.id
+
 	const [database] = await getDatabase()
 
 	const results = await database
@@ -41,12 +50,15 @@ friendsRouter.get('/incoming-requests/:id', async (req, res) => {
 	return res.status(200).send(results)
 })
 
-friendsRouter.patch('/request', friendRequestValidation, async (req, res) => {
-	const { by_user_id, to_user_id } = req.body
+friendsRouter.patch('/request', async (req, res) => {
+	if (!req.user?.id) {
+		return res.status(401).json({ error: 'token missing or invalid' })
+	}
+	const userId = parseInt(req.user.id)
+	const { approve_user_id } = req.body
 
-	const { errors } = validationResult(req)
-	if (errors.length > 0) {
-		return res.status(422).json({ errors })
+	if (!approve_user_id || approve_user_id === userId) {
+		return res.status(400).send({ error: 'Target user is invalid' })
 	}
 
 	const [database] = await getDatabase()
@@ -57,18 +69,17 @@ friendsRouter.patch('/request', friendRequestValidation, async (req, res) => {
 		.where(
 			or(
 				and(
-					and(eq(friends.uid1, by_user_id), eq(friends.uid2, to_user_id)),
+					and(eq(friends.uid1, approve_user_id), eq(friends.uid2, userId)),
 					eq(friends.status, 'req_uid1')
 				),
 				and(
-					and(eq(friends.uid1, to_user_id), eq(friends.uid2, by_user_id)),
+					and(eq(friends.uid1, userId), eq(friends.uid2, approve_user_id)),
 					eq(friends.status, 'req_uid2')
 				)
 			)
 		)
 
 	if (validFriendRequest.length === 0) {
-		console.log('Req invalid = ', validFriendRequest[0])
 		return res.status(404).send({ error: 'Pending friend request not found' })
 	}
 
@@ -87,7 +98,7 @@ friendsRouter.patch('/request', friendRequestValidation, async (req, res) => {
 			)
 		)
 
-	const createdFriendRelation = await database
+	const approvedFriendRelation = await database
 		.select()
 		.from(friends)
 		.where(
@@ -100,44 +111,63 @@ friendsRouter.patch('/request', friendRequestValidation, async (req, res) => {
 			)
 		)
 
-	return createdFriendRelation.length > 0
-		? res.json(createdFriendRelation[0])
+	return approvedFriendRelation.length > 0
+		? res.status(200).json(approvedFriendRelation[0])
 		: res.status(500).send({ error: 'Unexpected error' })
 })
 
 friendsRouter.post('/request', async (req, res) => {
-	const { by_user_id, to_user_id } = req.body
+	if (!req.user?.id) {
+		return res.status(401).json({ error: 'token missing or invalid' })
+	}
+	const userId = parseInt(req.user.id)
+	const { target_user_id } = req.body
+
+	if (!target_user_id || target_user_id === userId) {
+		return res.status(400).send({ error: 'Target user is invalid' })
+	}
+
 	const [database] = await getDatabase()
+
+	const [targetUser] = await database
+		.select()
+		.from(users)
+		.where(eq(users.id, target_user_id))
+
+	if (!targetUser || targetUser.status !== 'active') {
+		return res.status(400).send({ error: 'Target user is not valid' })
+	}
 
 	const existingFriendRequestFromUser = await database
 		.select()
 		.from(friends)
 		.where(
 			or(
-				and(eq(friends.uid1, by_user_id), eq(friends.uid2, to_user_id)),
-				and(eq(friends.uid1, to_user_id), eq(friends.uid2, by_user_id))
+				and(eq(friends.uid1, userId), eq(friends.uid2, target_user_id)),
+				and(eq(friends.uid1, target_user_id), eq(friends.uid2, userId))
 			)
 		)
 
 	if (existingFriendRequestFromUser.length > 0) {
-		console.log('Req status = ', existingFriendRequestFromUser[0])
 		return res
 			.status(405)
-			.send({ error: 'Already made a friends request to the requested user' })
+			.send({ error: 'Already exists a friend request between users' })
 	}
 
 	await database.insert(friends).values({
-		uid1: by_user_id,
-		uid2: to_user_id,
+		uid1: userId,
+		uid2: target_user_id,
 		status: 'req_uid1',
 	})
 
-	const friendRequestCreated = await database
+	const createdFriendRequest = await database
 		.select()
 		.from(friends)
-		.where(and(eq(friends.uid1, by_user_id), eq(friends.uid2, to_user_id)))
+		.where(and(eq(friends.uid1, userId), eq(friends.uid2, target_user_id)))
 
-	return res.status(201).json(friendRequestCreated[0])
+	return createdFriendRequest.length > 0
+		? res.status(201).json(createdFriendRequest[0])
+		: res.status(500).send({ error: 'Unexpected error' })
 })
 
 export default friendsRouter

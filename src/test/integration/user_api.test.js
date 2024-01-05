@@ -6,6 +6,8 @@ import { getDatabase } from '../../utils/mySqlConnection.js'
 import { initialUsers, initialChannels } from './initial_data.js'
 import { users } from '../../db/schema/user.schema.js'
 import { channels } from '../../db/schema/channel.schema.js'
+import { eq, or } from 'drizzle-orm'
+import { friends } from '../../db/schema/friend.schema.js'
 
 const api = supertest(app)
 const [database] = await getDatabase()
@@ -193,32 +195,44 @@ describe('Login user', async () => {
 	})
 })
 
-describe('Creating new channels', async () => {
+describe('Working with channels', async () => {
 	before(async () => {
-		await database.delete(channels) // channelTable.delete().where('id').execute()
-		await database.delete(users) // userTable.delete().where('id').execute()
-	})
+		await database.delete(channels)
+		await database.delete(users)
 
-	it('succeeds providing only name, description & owner ID', async () => {
 		const testUser = initialUsers[0]
 
-		const userResponse = await api.post('/api/user').send({
+		await api.post('/api/user').send({
 			email: testUser.email,
 			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
-		const newUserId = userResponse._body.userId
+	})
 
-		assert(newUserId > 0)
+	beforeEach(async () => {
+		await database.delete(channels)
+	})
+
+	it('succeeds creating a new channel with valid data and auth token', async () => {
+		const testUser = initialUsers[0]
+
+		const loginResponse = await api.post('/api/login').send({
+			email: testUser.email,
+			password: testUser.password,
+		})
+		const { token } = loginResponse.body
+		assert(token)
 
 		const testChannel = initialChannels[0]
-		const testChannelResponse = await api.post('/api/channel').send({
-			title: testChannel.title,
-			description: testChannel.description,
-			owner_id: newUserId,
-		})
+		const testChannelResponse = await api
+			.post('/api/channel')
+			.set('Authorization', 'bearer ' + token)
+			.send({
+				title: testChannel.title,
+				description: testChannel.description,
+			})
 
 		const result = await database.select().from(channels)
 		const createdChannel = result.find(
@@ -233,8 +247,148 @@ describe('Creating new channels', async () => {
 		assert(createdChannel)
 	})
 
+	it('succeeds deleting a channel being the owner & with auth token', async () => {
+		const testUser = initialUsers[0]
+
+		const loginResponse = await api.post('/api/login').send({
+			email: testUser.email,
+			password: testUser.password,
+		})
+		const { token } = loginResponse.body
+		assert(token)
+
+		const testChannel = initialChannels[0]
+		const testChannelResponse = await api
+			.post('/api/channel')
+			.set('Authorization', 'bearer ' + token)
+			.send({
+				title: testChannel.title,
+				description: testChannel.description,
+			})
+
+		const result = await database.select().from(channels)
+		const createdChannel = result.find(
+			(channel) => channel.title === testChannel.title
+		)
+
+		assert.strictEqual(testChannelResponse.status, 201)
+		assert.match(
+			testChannelResponse.headers['content-type'],
+			/application\/json/
+		)
+		assert(createdChannel)
+
+		const deleteResult = await api
+			.delete(`/api/channel/${createdChannel.id}`)
+			.set('Authorization', 'bearer ' + token)
+
+		assert.strictEqual(deleteResult.status, 200)
+		assert(deleteResult.msg !== '')
+	})
+
 	after(async () => {
 		await database.delete(channels)
+	})
+})
+
+describe('Working with friends requests', async () => {
+	before(async () => {
+		await database.delete(friends)
+		await database.delete(users)
+
+		await api.post('/api/user').send({
+			email: initialUsers[0].email,
+			first_name: initialUsers[0].firstName,
+			last_name: initialUsers[0].lastName || '',
+			username: initialUsers[0].username,
+			password: initialUsers[0].password,
+			password_confirm: initialUsers[0].password,
+		})
+
+		await api.post('/api/user').send({
+			email: initialUsers[1].email,
+			first_name: initialUsers[1].firstName,
+			last_name: initialUsers[1].lastName || '',
+			username: initialUsers[1].username,
+			password: initialUsers[1].password,
+			password_confirm: initialUsers[1].password,
+		})
+
+		await api.post('/api/user').send({
+			email: initialUsers[2].email,
+			first_name: initialUsers[2].firstName,
+			last_name: initialUsers[2].lastName || '',
+			username: initialUsers[2].username,
+			password: initialUsers[2].password,
+			password_confirm: initialUsers[2].password,
+		})
+
+		// Change first and second user status to 'active'
+		await database
+			.update(users)
+			.set({ status: 'active' })
+			.where(
+				or(
+					eq(users.email, initialUsers[0].email),
+					eq(users.email, initialUsers[1].email)
+				)
+			)
+	})
+
+	it('creates friend request with target user & valid auth token', async () => {
+		const testUser = initialUsers[0]
+		const testUserResponse = await api.post('/api/login').send({
+			email: testUser.email,
+			password: testUser.password,
+		})
+		const { token } = testUserResponse.body ?? undefined
+		assert(token)
+
+		const targetUsers = await database
+			.select()
+			.from(users)
+			.where(eq(users.email, initialUsers[1].email))
+		const targetUser = targetUsers[0]
+		assert(targetUser)
+
+		const requestResult = await api
+			.post('/api/friends/request')
+			.set('Authorization', 'bearer ' + token)
+			.send({ target_user_id: targetUser.id })
+		const { uid1, uid2, status } = requestResult.body
+
+		assert(uid1)
+		assert.equal(uid2, targetUser.id)
+		assert.equal(status, 'req_uid1')
+	})
+
+	it('fails friend request if target user is not active', async () => {
+		const testUser = initialUsers[0]
+		const testUserResponse = await api.post('/api/login').send({
+			email: testUser.email,
+			password: testUser.password,
+		})
+		const { token } = testUserResponse.body ?? undefined
+		assert(token)
+
+		const [targetUser] = await database
+			.select()
+			.from(users)
+			.where(eq(users.email, initialUsers[2].email))
+		assert(targetUser)
+
+		const requestResult = await api
+			.post('/api/friends/request')
+			.set('Authorization', 'bearer ' + token)
+			.send({ target_user_id: targetUser.id })
+		const { error } = requestResult.body
+
+		assert.equal(requestResult.status, 400)
+		assert(error)
+	})
+
+	after(async () => {
+		await database.delete(friends)
 
 		/// Force exit due to Test Runner not able to stop after all test are done
 		process.exit()
