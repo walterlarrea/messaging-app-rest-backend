@@ -22,6 +22,7 @@ const channelValidation = checkSchema({
 		errorMessage: 'Invalid description',
 	},
 	owner_id: {
+		optional: true,
 		isInt: true,
 		notEmpty: {
 			errorMessage: 'Must specify the channels owner ID',

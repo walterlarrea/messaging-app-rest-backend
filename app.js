@@ -18,7 +18,7 @@ app.get('/', (request, response) => {
 
 app.use('/api/user', usersRouter)
 app.use('/api/login', loginRouter)
-app.use('/api/channel', channelsRouter)
+app.use('/api/channel', middleware.userExtractor, channelsRouter)
 app.use('/api/friends', middleware.userExtractor, friendsRouter)
 
 export default app

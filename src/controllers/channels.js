@@ -32,6 +32,11 @@ channelsRouter.get('/:id', async (req, res) => {
 })
 
 channelsRouter.delete('/:id', async (req, res) => {
+	if (!req.user?.id) {
+		return res.status(401).json({ error: 'token missing or invalid' })
+	}
+	const userId = parseInt(req.user.id)
+
 	const requestedId = req.params.id
 	const [database] = await getDatabase()
 
@@ -42,6 +47,10 @@ channelsRouter.delete('/:id', async (req, res) => {
 
 	if (result.length === 0) {
 		return res.status(404).json({ error: 'channel not found on the platform' })
+	}
+	const channel = result[0]
+	if (channel.ownerId !== userId) {
+		return res.status(403).json({ error: 'not the owner of the channel' })
 	}
 
 	const [deletionInfo] = await database
@@ -55,7 +64,12 @@ channelsRouter.delete('/:id', async (req, res) => {
 })
 
 channelsRouter.post('/', channelValidation, async (req, res) => {
-	const { title, description, owner_id } = req.body
+	if (!req.user?.id) {
+		return res.status(401).json({ error: 'token missing or invalid' })
+	}
+	const userId = parseInt(req.user.id)
+
+	const { title, description } = req.body
 
 	const { errors } = validationResult(req)
 	if (errors.length > 0) {
@@ -78,7 +92,7 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 	await database.insert(channels).values({
 		title,
 		description,
-		ownerId: owner_id,
+		ownerId: userId,
 	})
 
 	const channelCreated = await database
