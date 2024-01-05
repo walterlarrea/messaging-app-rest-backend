@@ -111,7 +111,7 @@ friendsRouter.patch('/request', async (req, res) => {
 		)
 
 	return approvedFriendRelation.length > 0
-		? res.json(approvedFriendRelation[0])
+		? res.status(200).json(approvedFriendRelation[0])
 		: res.status(500).send({ error: 'Unexpected error' })
 })
 
