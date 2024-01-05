@@ -13,6 +13,13 @@ export const initialUsers = [
 		username: 'Eduli',
 		password: '12345678',
 	},
+	{
+		email: 'gabriel@mail.com',
+		firstName: 'Gabriel',
+		lastName: 'Chilango',
+		username: 'Gabito',
+		password: '12345678',
+	},
 ]
 
 export const initialChannels = [
