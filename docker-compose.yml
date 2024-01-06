@@ -3,6 +3,7 @@ version: '3'
 services:
   messaging_app_api:
     image: walterlarrea/messagingapp:1.0
+    restart: always
     ports:
       - '5000:8080'
     volumes:
@@ -14,6 +15,7 @@ services:
 
   messaging_app_mysql:
     image: mysql:8.0.30
+    restart: always
     ports:
       - '${MYSQL_PORT}:3306'
     environment:
