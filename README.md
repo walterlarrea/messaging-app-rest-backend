@@ -122,6 +122,12 @@ SET @DEV_USER_PASS = '';
 ...
 ```
 
+### 7. Build api's docker image
+
+```shell
+npm run docker:build
+```
+
 ### 7. Deploy infrastructure
 
 ```shell
@@ -132,7 +138,7 @@ _This command will:_
 
 - Build a docker container and configure the Mysql server
 - Create users and databases on the server
-- Deploy test and development schemas to the database (for production optionally run "`npm run db:deploy:production`")
+- Deploy test and development schemas to the database
 
 ### 8. Run the dev server
 
@@ -152,3 +158,5 @@ npm run dev
 ```shell
 npm test
 ```
+
+## Fully automated production environment is in progress
