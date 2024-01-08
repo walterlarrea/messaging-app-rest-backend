@@ -1,4 +1,10 @@
-import { serial, mysqlTable, varchar, mysqlEnum } from 'drizzle-orm/mysql-core'
+import {
+	serial,
+	mysqlTable,
+	varchar,
+	mysqlEnum,
+	text,
+} from 'drizzle-orm/mysql-core'
 
 export const users = mysqlTable('users', {
 	id: serial('id'),
@@ -13,4 +19,5 @@ export const users = mysqlTable('users', {
 	status: mysqlEnum('status', ['inactive', 'active', 'deleted'])
 		.notNull()
 		.default('inactive'),
+	refreshToken: text('refresh_token'),
 })
