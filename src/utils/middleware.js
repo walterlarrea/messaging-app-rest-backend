@@ -23,35 +23,24 @@ const credentials = (req, res, next) => {
 	next()
 }
 
-const tokenExtractor = (req, res, next) => {
+const verifyAccessToken = (req, res, next) => {
 	const authorization = req.get('authorization')
+	if (!authorization) return res.sendStatus(401)
 
-	if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-		req.token = authorization.substring(7)
-	}
-
-	next()
-}
-
-const userExtractor = (req, res, next) => {
-	const authorization = req.get('authorization')
-
-	if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-		jwt.verify(req.token, JWT_SECRET, (err, decodedToken) => {
-			if (err) return res.sendStatus(403)
-			req.user = {
-				username: decodedToken.username,
-				id: decodedToken.id.toString(),
-			}
-			next()
-		})
-	}
+	const accessToken = authorization.split(' ')[1]
+	jwt.verify(accessToken, JWT_SECRET, (err, decodedToken) => {
+		if (err) return res.sendStatus(403)
+		req.user = {
+			id: decodedToken.id.toString(),
+			username: decodedToken.username,
+		}
+		next()
+	})
 }
 
 export default {
 	requestLogger,
 	unknownEndpoint,
-	tokenExtractor,
-	userExtractor,
+	verifyAccessToken,
 	credentials,
 }

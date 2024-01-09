@@ -18,7 +18,7 @@ describe('Creating channels', async () => {
 
 		const testUser = initialUsers[0]
 
-		const response = await api.post('/api/user').send({
+		const response = await api.post('/register').send({
 			email: testUser.email,
 			first_name: testUser.firstName,
 			username: testUser.username,
@@ -35,7 +35,7 @@ describe('Creating channels', async () => {
 	it('succeeds with valid data & valid auth token', async () => {
 		const testUser = initialUsers[0]
 
-		const loginResponse = await api.post('/api/login').send({
+		const loginResponse = await api.post('/auth').send({
 			email: testUser.email,
 			password: testUser.password,
 		})
@@ -76,7 +76,7 @@ describe('Deleting channels', async () => {
 
 		const testUser = initialUsers[0]
 
-		const response = await api.post('/api/user').send({
+		const response = await api.post('/register').send({
 			email: testUser.email,
 			first_name: testUser.firstName,
 			username: testUser.username,
@@ -93,7 +93,7 @@ describe('Deleting channels', async () => {
 	it('succeeds when user is the owner & valid auth token', async () => {
 		const testUser = initialUsers[0]
 
-		const loginResponse = await api.post('/api/login').send({
+		const loginResponse = await api.post('/auth').send({
 			email: testUser.email,
 			password: testUser.password,
 		})

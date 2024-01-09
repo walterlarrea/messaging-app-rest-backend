@@ -1,22 +1,18 @@
-import { Router } from 'express'
 import { validationResult } from 'express-validator'
-import channelValidation from '../validators/channelValidation.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { channels } from '../db/schema/channel.schema.js'
 import { eq, like } from 'drizzle-orm'
 
-const channelsRouter = Router()
-
-channelsRouter.get('/', async (req, res) => {
+const gelAllChannels = async (req, res) => {
 	const [database] = await getDatabase()
 
 	const result = await database.select().from(channels)
 
 	// closeConnection()
 	return res.json(result)
-})
+}
 
-channelsRouter.get('/:id', async (req, res) => {
+const getById = async (req, res) => {
 	const requestedId = req.params.id
 	const [database] = await getDatabase()
 
@@ -29,9 +25,9 @@ channelsRouter.get('/:id', async (req, res) => {
 	return result.length > 0
 		? res.json(result[0])
 		: res.status(404).json({ error: 'channel not found on the platform' })
-})
+}
 
-channelsRouter.delete('/:id', async (req, res) => {
+const deleteById = async (req, res) => {
 	if (!req.user?.id) {
 		return res.status(401).json({ error: 'token missing or invalid' })
 	}
@@ -61,9 +57,9 @@ channelsRouter.delete('/:id', async (req, res) => {
 	return deletionInfo.affectedRows > 0
 		? res.status(200).json({ msg: 'channel deleted from the platform' })
 		: res.status(404).json({ error: 'not able to perform action delete' })
-})
+}
 
-channelsRouter.post('/', channelValidation, async (req, res) => {
+const createChannel = async (req, res) => {
 	if (!req.user) {
 		return res.status(401).json({ error: 'token missing or invalid' })
 	}
@@ -104,6 +100,11 @@ channelsRouter.post('/', channelValidation, async (req, res) => {
 
 	// closeConnection()
 	return res.status(201).json(channelCreated[0])
-})
+}
 
-export default channelsRouter
+export default {
+	gelAllChannels,
+	getById,
+	createChannel,
+	deleteById,
+}

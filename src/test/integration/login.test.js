@@ -20,7 +20,7 @@ describe('Login user', async () => {
 		await database.delete(friends)
 		await database.delete(users)
 
-		const response = await api.post('/api/user').send({
+		const response = await api.post('/register').send({
 			email: testUser.email,
 			first_name: testUser.firstName,
 			username: testUser.username,
@@ -36,7 +36,7 @@ describe('Login user', async () => {
 
 	it('succeeds providing only email & password', async () => {
 		const testUser = initialUsers[0]
-		const testUserResponse = await api.post('/api/login').send({
+		const testUserResponse = await api.post('/auth').send({
 			email: testUser.email,
 			password: testUser.password,
 		})
