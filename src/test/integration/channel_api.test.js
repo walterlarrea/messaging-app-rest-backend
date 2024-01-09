@@ -6,6 +6,7 @@ import { getDatabase } from '../../utils/mySqlConnection.js'
 import { initialUsers, initialChannels } from './initial_data.js'
 import { users } from '../../db/schema/user.schema.js'
 import { channels } from '../../db/schema/channel.schema.js'
+import { eq } from 'drizzle-orm'
 
 const api = supertest(app)
 const [database] = await getDatabase()
@@ -17,13 +18,18 @@ describe('Creating channels', async () => {
 
 		const testUser = initialUsers[0]
 
-		await api.post('/api/user').send({
+		const response = await api.post('/api/user').send({
 			email: testUser.email,
 			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
+
+		await database
+			.update(users)
+			.set({ status: 'active' })
+			.where(eq(users.id, response?.body?.userId))
 	})
 
 	it('succeeds with valid data & valid auth token', async () => {
@@ -33,13 +39,13 @@ describe('Creating channels', async () => {
 			email: testUser.email,
 			password: testUser.password,
 		})
-		const { token } = loginResponse.body
-		assert(token)
+		const { accessToken } = loginResponse.body
+		assert(accessToken)
 
 		const testChannel = initialChannels[0]
 		const testChannelResponse = await api
 			.post('/api/channel')
-			.set('Authorization', 'bearer ' + token)
+			.set('Authorization', 'Bearer ' + accessToken)
 			.send({
 				title: testChannel.title,
 				description: testChannel.description,
@@ -70,13 +76,18 @@ describe('Deleting channels', async () => {
 
 		const testUser = initialUsers[0]
 
-		await api.post('/api/user').send({
+		const response = await api.post('/api/user').send({
 			email: testUser.email,
 			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
+
+		await database
+			.update(users)
+			.set({ status: 'active' })
+			.where(eq(users.id, response?.body?.userId))
 	})
 
 	it('succeeds when user is the owner & valid auth token', async () => {
@@ -86,13 +97,13 @@ describe('Deleting channels', async () => {
 			email: testUser.email,
 			password: testUser.password,
 		})
-		const { token } = loginResponse.body
-		assert(token)
+		const { accessToken } = loginResponse.body
+		assert(accessToken)
 
 		const testChannel = initialChannels[0]
 		const testChannelResponse = await api
 			.post('/api/channel')
-			.set('Authorization', 'bearer ' + token)
+			.set('Authorization', 'Bearer ' + accessToken)
 			.send({
 				title: testChannel.title,
 				description: testChannel.description,
@@ -112,7 +123,7 @@ describe('Deleting channels', async () => {
 
 		const deleteResult = await api
 			.delete(`/api/channel/${createdChannel.id}`)
-			.set('Authorization', 'bearer ' + token)
+			.set('Authorization', 'Bearer ' + accessToken)
 
 		assert.strictEqual(deleteResult.status, 200)
 		assert(deleteResult.msg !== '')

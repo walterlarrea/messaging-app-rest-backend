@@ -11,7 +11,7 @@ import refreshRouter from './src/controllers/refreshTokenController.js'
 
 const app = express()
 
-app.use(middleware.requestLogger)
+// app.use(middleware.requestLogger)
 
 app.use(middleware.credentials)
 
