@@ -7,9 +7,11 @@ import { initialUsers } from './initial_data.js'
 import { users } from '../../db/schema/user.schema.js'
 import { channels } from '../../db/schema/channel.schema.js'
 import { friends } from '../../db/schema/friend.schema.js'
+import { eq } from 'drizzle-orm'
 
 const api = supertest(app)
 const [database] = await getDatabase()
+
 describe('Login user', async () => {
 	beforeEach(async () => {
 		const testUser = initialUsers[0]
@@ -18,13 +20,18 @@ describe('Login user', async () => {
 		await database.delete(friends)
 		await database.delete(users)
 
-		await api.post('/api/user').send({
+		const response = await api.post('/api/user').send({
 			email: testUser.email,
 			first_name: testUser.firstName,
 			username: testUser.username,
 			password: testUser.password,
 			password_confirm: testUser.password,
 		})
+
+		await database
+			.update(users)
+			.set({ status: 'active' })
+			.where(eq(users.id, response?.body?.userId))
 	})
 
 	it('succeeds providing only email & password', async () => {
@@ -34,13 +41,12 @@ describe('Login user', async () => {
 			password: testUser.password,
 		})
 
-		const { token, firstName, username } = testUserResponse.body ?? {}
+		const { accessToken, role } = testUserResponse.body ?? {}
 
 		assert.strictEqual(testUserResponse.status, 200)
 		assert.match(testUserResponse.headers['content-type'], /application\/json/)
-		assert(token)
-		assert(firstName)
-		assert(username)
+		assert(accessToken)
+		assert(role)
 	})
 
 	after(async () => {

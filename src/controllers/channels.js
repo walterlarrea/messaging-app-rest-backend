@@ -64,7 +64,7 @@ channelsRouter.delete('/:id', async (req, res) => {
 })
 
 channelsRouter.post('/', channelValidation, async (req, res) => {
-	if (!req.user?.id) {
+	if (!req.user) {
 		return res.status(401).json({ error: 'token missing or invalid' })
 	}
 	const userId = parseInt(req.user.id)

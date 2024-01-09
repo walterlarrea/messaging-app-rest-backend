@@ -61,8 +61,8 @@ describe('Creating friends requests', async () => {
 			email: testUser.email,
 			password: testUser.password,
 		})
-		const { token } = testUserResponse.body ?? undefined
-		assert(token)
+		const { accessToken } = testUserResponse.body ?? undefined
+		assert(accessToken)
 
 		const targetUsers = await database
 			.select()
@@ -73,7 +73,7 @@ describe('Creating friends requests', async () => {
 
 		const requestResult = await api
 			.post('/api/friends/request')
-			.set('Authorization', 'bearer ' + token)
+			.set('Authorization', 'Bearer ' + accessToken)
 			.send({ target_user_id: targetUser.id })
 		const { uid1, uid2, status } = requestResult.body
 
@@ -88,8 +88,8 @@ describe('Creating friends requests', async () => {
 			email: testUser.email,
 			password: testUser.password,
 		})
-		const { token } = testUserResponse.body ?? undefined
-		assert(token)
+		const { accessToken } = testUserResponse.body ?? undefined
+		assert(accessToken)
 
 		const [targetUser] = await database
 			.select()
@@ -99,7 +99,7 @@ describe('Creating friends requests', async () => {
 
 		const requestResult = await api
 			.post('/api/friends/request')
-			.set('Authorization', 'bearer ' + token)
+			.set('Authorization', 'bearer ' + accessToken)
 			.send({ target_user_id: targetUser.id })
 		const { error } = requestResult.body
 
