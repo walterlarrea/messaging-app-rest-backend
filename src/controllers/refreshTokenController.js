@@ -41,8 +41,6 @@ refreshRouter.get('/', async (req, res) => {
 		const accessToken = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '20s' })
 		res.json({ accessToken, role: user.userType })
 	})
-
-	console.log('FINAL REFRESH END')
 })
 
 export default refreshRouter
