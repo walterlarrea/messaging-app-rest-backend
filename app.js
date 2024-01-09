@@ -8,9 +8,9 @@ import loginRouter from './src/routes/auth.js'
 import refreshToken from './src/routes/refresh.js'
 
 import middleware from './src/utils/middleware.js'
-import usersRouter from './src/controllers/users.js'
-import channelsRouter from './src/controllers/channels.js'
-import friendsRouter from './src/controllers/friends.js'
+import usersRouter from './src/routes/api/users.js'
+import channelsRouter from './src/routes/api/channels.js'
+import friendsRouter from './src/routes/api/friends.js'
 
 const app = express()
 

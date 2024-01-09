@@ -1,14 +1,9 @@
-import { Router } from 'express'
-// import { validationResult } from 'express-validator'
-// import friendRequestValidation from '../validators/friendReqValidation.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { friends } from '../db/schema/friend.schema.js'
 import { and, eq, or } from 'drizzle-orm'
 import { users } from '../db/schema/user.schema.js'
 
-const friendsRouter = Router()
-
-friendsRouter.get('/', async (req, res) => {
+const getAllFriends = async (req, res) => {
 	if (!req.user?.id) {
 		return res.status(401).json({ error: 'token missing or invalid' })
 	}
@@ -27,9 +22,9 @@ friendsRouter.get('/', async (req, res) => {
 		)
 
 	return res.status(200).send(results)
-})
+}
 
-friendsRouter.get('/incoming-requests', async (req, res) => {
+const friendRequests = async (req, res) => {
 	if (!req.user?.id) {
 		return res.status(401).json({ error: 'token missing or invalid' })
 	}
@@ -48,9 +43,9 @@ friendsRouter.get('/incoming-requests', async (req, res) => {
 		)
 
 	return res.status(200).send(results)
-})
+}
 
-friendsRouter.patch('/request', async (req, res) => {
+const requestFriend = async (req, res) => {
 	if (!req.user?.id) {
 		return res.status(401).json({ error: 'token missing or invalid' })
 	}
@@ -114,9 +109,9 @@ friendsRouter.patch('/request', async (req, res) => {
 	return approvedFriendRelation.length > 0
 		? res.status(200).json(approvedFriendRelation[0])
 		: res.status(500).send({ error: 'Unexpected error' })
-})
+}
 
-friendsRouter.post('/request', async (req, res) => {
+const approveFriendRequest = async (req, res) => {
 	if (!req.user?.id) {
 		return res.status(401).json({ error: 'token missing or invalid' })
 	}
@@ -168,6 +163,11 @@ friendsRouter.post('/request', async (req, res) => {
 	return createdFriendRequest.length > 0
 		? res.status(201).json(createdFriendRequest[0])
 		: res.status(500).send({ error: 'Unexpected error' })
-})
+}
 
-export default friendsRouter
+export default {
+	getAllFriends,
+	friendRequests,
+	requestFriend,
+	approveFriendRequest,
+}

@@ -1,11 +1,8 @@
-import { Router } from 'express'
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
-const usersRouter = Router()
-
-usersRouter.get('/', async (req, res) => {
+const getAllUsers = async (req, res) => {
 	const [database] = await getDatabase()
 
 	const result = await database
@@ -22,9 +19,9 @@ usersRouter.get('/', async (req, res) => {
 
 	// closeConnection()
 	res.json(result)
-})
+}
 
-usersRouter.get('/:email', async (req, res) => {
+const getByEmail = async (req, res) => {
 	const requestedEmail = req.params.email
 	const [database] = await getDatabase()
 
@@ -45,6 +42,9 @@ usersRouter.get('/:email', async (req, res) => {
 	result.length > 0
 		? res.json(result)
 		: res.status(404).json({ error: 'user not found on the platform' })
-})
+}
 
-export default usersRouter
+export default {
+	getAllUsers,
+	getByEmail,
+}
