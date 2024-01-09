@@ -51,7 +51,7 @@ export const handleLogin = async (req, res) => {
 		id: user.id,
 	}
 	const accessToken = jwt.sign(userForToken, JWT_SECRET, {
-		expiresIn: '20s', // Put to 1 hour
+		expiresIn: '1h', // Put to 1 hour
 	})
 	const refreshToken = jwt.sign(userForToken, JWT_SECRET, {
 		expiresIn: '1d',

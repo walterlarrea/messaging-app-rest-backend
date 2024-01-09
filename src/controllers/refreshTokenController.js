@@ -35,7 +35,7 @@ export const handleRefreshToken = async (req, res) => {
 			username: user.username,
 			id: user.id,
 		}
-		const accessToken = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '20s' })
+		const accessToken = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '1h' })
 		res.json({ accessToken, role: user.userType })
 	})
 }
