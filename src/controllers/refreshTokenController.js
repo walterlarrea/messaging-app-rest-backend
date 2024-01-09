@@ -1,13 +1,10 @@
 import jwt from 'jsonwebtoken'
-import { Router } from 'express'
 import { JWT_SECRET } from '../constants/config.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
-const refreshRouter = Router()
-
-refreshRouter.get('/', async (req, res) => {
+export const handleRefreshToken = async (req, res) => {
 	const cookies = req.cookies
 
 	if (!cookies?.refresh_token) return res.sendStatus(401)
@@ -41,6 +38,4 @@ refreshRouter.get('/', async (req, res) => {
 		const accessToken = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '20s' })
 		res.json({ accessToken, role: user.userType })
 	})
-})
-
-export default refreshRouter
+}

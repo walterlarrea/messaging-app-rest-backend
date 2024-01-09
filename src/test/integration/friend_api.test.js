@@ -16,7 +16,7 @@ describe('Creating friends requests', async () => {
 		await database.delete(friends)
 		await database.delete(users)
 
-		await api.post('/api/user').send({
+		await api.post('/register').send({
 			email: initialUsers[0].email,
 			first_name: initialUsers[0].firstName,
 			last_name: initialUsers[0].lastName || '',
@@ -25,7 +25,7 @@ describe('Creating friends requests', async () => {
 			password_confirm: initialUsers[0].password,
 		})
 
-		await api.post('/api/user').send({
+		await api.post('/register').send({
 			email: initialUsers[1].email,
 			first_name: initialUsers[1].firstName,
 			last_name: initialUsers[1].lastName || '',
@@ -34,7 +34,7 @@ describe('Creating friends requests', async () => {
 			password_confirm: initialUsers[1].password,
 		})
 
-		await api.post('/api/user').send({
+		await api.post('/register').send({
 			email: initialUsers[2].email,
 			first_name: initialUsers[2].firstName,
 			last_name: initialUsers[2].lastName || '',
@@ -57,7 +57,7 @@ describe('Creating friends requests', async () => {
 
 	it('succeeds with valid target user & valid auth token', async () => {
 		const testUser = initialUsers[0]
-		const testUserResponse = await api.post('/api/login').send({
+		const testUserResponse = await api.post('/auth').send({
 			email: testUser.email,
 			password: testUser.password,
 		})
@@ -84,7 +84,7 @@ describe('Creating friends requests', async () => {
 
 	it('fails if target user status is not active', async () => {
 		const testUser = initialUsers[0]
-		const testUserResponse = await api.post('/api/login').send({
+		const testUserResponse = await api.post('/auth').send({
 			email: testUser.email,
 			password: testUser.password,
 		})

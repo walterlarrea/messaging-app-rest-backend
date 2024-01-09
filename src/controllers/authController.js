@@ -1,14 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { compare } from 'bcrypt'
-import { Router } from 'express'
 import { JWT_SECRET } from '../constants/config.js'
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
-const loginRouter = Router()
-
-loginRouter.post('/', async (req, res) => {
+export const handleLogin = async (req, res) => {
 	const { email, password } = req.body
 
 	if (!email || !password) {
@@ -74,6 +71,6 @@ loginRouter.post('/', async (req, res) => {
 		maxAge: 1 * 60 * 60 * 1000,
 	})
 	res.status(200).send({ accessToken, role: user.userType })
-})
+}
 
-export default loginRouter
+export default handleLogin
