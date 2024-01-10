@@ -1,6 +1,6 @@
 import { getDatabase } from '../utils/mySqlConnection.js'
 import { friends } from '../db/schema/friend.schema.js'
-import { and, eq, or } from 'drizzle-orm'
+import { and, eq, ne, or } from 'drizzle-orm'
 import { users } from '../db/schema/user.schema.js'
 
 const getAllFriends = async (req, res) => {
@@ -9,13 +9,24 @@ const getAllFriends = async (req, res) => {
 			.status(401)
 			.json({ errors: [{ msg: 'token missing or invalid' }] })
 	}
-	const userId = req.user.id
+	const userId = parseInt(req.user.id)
 
 	const [database] = await getDatabase()
 
 	const results = await database
-		.select()
+		.select({
+			id: users.id,
+			firstName: users.firstName,
+			username: users.username,
+		})
 		.from(friends)
+		.leftJoin(
+			users,
+			and(
+				ne(users.id, userId),
+				or(eq(users.id, friends.uid1), eq(users.id, friends.uid2))
+			)
+		)
 		.where(
 			and(
 				or(eq(friends.uid1, userId), eq(friends.uid2, userId)),
