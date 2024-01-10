@@ -11,7 +11,7 @@ export const handleLogin = async (req, res) => {
 	if (!email || !password) {
 		return res
 			.status(400)
-			.json({ errors: ['Email and passwords are required'] })
+			.json({ errors: [{ msg: 'Email and passwords are required' }] })
 	}
 
 	const [database] = await getDatabase()
