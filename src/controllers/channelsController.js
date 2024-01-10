@@ -22,11 +22,13 @@ const getById = async (req, res) => {
 		.where(eq(channels.id, requestedId))
 
 	// closeConnection()
-	return result.length > 0
-		? res.json(result[0])
-		: res
-				.status(404)
-				.json({ errors: [{ msg: 'channel not found on the platform' }] })
+	if (result.length > 0) {
+		res.json(result[0])
+	} else {
+		res
+			.status(404)
+			.json({ errors: [{ msg: 'channel not found on the platform' }] })
+	}
 }
 
 const deleteById = async (req, res) => {
@@ -62,11 +64,13 @@ const deleteById = async (req, res) => {
 		.where(eq(channels.id, requestedId))
 
 	// closeConnection()
-	return deletionInfo.affectedRows > 0
-		? res.status(200).json({ msg: 'channel deleted from the platform' })
-		: res
-				.status(404)
-				.json({ errors: [{ msg: 'not able to perform action delete' }] })
+	if (deletionInfo.affectedRows > 0) {
+		return res.status(200).json({ msg: 'channel deleted from the platform' })
+	} else {
+		return res
+			.status(404)
+			.json({ errors: [{ msg: 'not able to perform action delete' }] })
+	}
 }
 
 const createChannel = async (req, res) => {
