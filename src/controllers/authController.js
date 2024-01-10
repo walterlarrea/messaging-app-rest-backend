@@ -29,21 +29,25 @@ export const handleLogin = async (req, res) => {
 		.where(like(users.email, email))
 
 	if (result.length === 0) {
-		return res.status(400).json({ errors: ['User not found'] })
+		return res.status(400).json({ errors: [{ msg: 'User not found' }] })
 	}
 	const user = result[0]
 	if (user.status !== 'active') {
-		return res.status(400).json({ errors: ['User not activated'] })
+		return res.status(400).json({ errors: [{ msg: 'User not activated' }] })
 	}
 	if (result.length > 1) {
-		return res.status(400).json({ errors: ['An unexpected error ocurred'] })
+		return res
+			.status(400)
+			.json({ errors: [{ msg: 'An unexpected error ocurred' }] })
 	}
 
 	const passwordCorrect =
 		user === null ? false : await compare(password, user.password)
 
 	if (!(user && passwordCorrect)) {
-		return res.status(400).json({ errors: ['invalid username or password'] })
+		return res
+			.status(400)
+			.json({ errors: [{ msg: 'invalid username or password' }] })
 	}
 
 	const userForToken = {

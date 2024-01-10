@@ -25,7 +25,7 @@ export const handleRefreshToken = async (req, res) => {
 		.where(like(users.refreshToken, refreshToken))
 
 	if (result.length === 0) {
-		return res.status(400).json({ errors: ['User not found'] })
+		return res.status(400).json({ errors: [{ msg: 'User not found' }] })
 	}
 	const user = result[0]
 

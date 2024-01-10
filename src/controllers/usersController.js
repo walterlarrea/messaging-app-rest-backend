@@ -41,7 +41,9 @@ const getByEmail = async (req, res) => {
 	// closeConnection()
 	result.length > 0
 		? res.json(result)
-		: res.status(404).json({ error: 'user not found on the platform' })
+		: res
+				.status(404)
+				.json({ errors: [{ msg: 'user not found on the platform' }] })
 }
 
 export default {

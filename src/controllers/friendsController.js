@@ -5,7 +5,9 @@ import { users } from '../db/schema/user.schema.js'
 
 const getAllFriends = async (req, res) => {
 	if (!req.user?.id) {
-		return res.status(401).json({ error: 'token missing or invalid' })
+		return res
+			.status(401)
+			.json({ errors: [{ msg: 'token missing or invalid' }] })
 	}
 	const userId = req.user.id
 
@@ -26,7 +28,9 @@ const getAllFriends = async (req, res) => {
 
 const friendRequests = async (req, res) => {
 	if (!req.user?.id) {
-		return res.status(401).json({ error: 'token missing or invalid' })
+		return res
+			.status(401)
+			.json({ errors: [{ msg: 'token missing or invalid' }] })
 	}
 	const userId = req.user.id
 
@@ -47,13 +51,15 @@ const friendRequests = async (req, res) => {
 
 const requestFriend = async (req, res) => {
 	if (!req.user?.id) {
-		return res.status(401).json({ error: 'token missing or invalid' })
+		return res
+			.status(401)
+			.json({ errors: [{ msg: 'token missing or invalid' }] })
 	}
 	const userId = parseInt(req.user.id)
 	const { approve_user_id } = req.body
 
 	if (!approve_user_id || approve_user_id === userId) {
-		return res.status(400).send({ error: 'Target user is invalid' })
+		return res.status(400).send({ errors: [{ msg: 'Target user is invalid' }] })
 	}
 
 	const [database] = await getDatabase()
@@ -75,7 +81,9 @@ const requestFriend = async (req, res) => {
 		)
 
 	if (validFriendRequest.length === 0) {
-		return res.status(404).send({ error: 'Pending friend request not found' })
+		return res
+			.status(404)
+			.send({ errors: [{ msg: 'Pending friend request not found' }] })
 	}
 
 	const friendRequest = validFriendRequest[0]
@@ -108,18 +116,18 @@ const requestFriend = async (req, res) => {
 
 	return approvedFriendRelation.length > 0
 		? res.status(200).json(approvedFriendRelation[0])
-		: res.status(500).send({ error: 'Unexpected error' })
+		: res.status(500).send({ errors: [{ msg: 'Unexpected error' }] })
 }
 
 const approveFriendRequest = async (req, res) => {
 	if (!req.user?.id) {
-		return res.status(401).json({ error: 'token missing or invalid' })
+		return res.status(401).json({ errors: ['token missing or invalid'] })
 	}
 	const userId = parseInt(req.user.id)
 	const { target_user_id } = req.body
 
 	if (!target_user_id || target_user_id === userId) {
-		return res.status(400).send({ error: 'Target user is invalid' })
+		return res.status(400).send({ errors: ['Target user is invalid'] })
 	}
 
 	const [database] = await getDatabase()
@@ -130,7 +138,7 @@ const approveFriendRequest = async (req, res) => {
 		.where(eq(users.id, target_user_id))
 
 	if (!targetUser || targetUser.status !== 'active') {
-		return res.status(400).send({ error: 'Target user is not valid' })
+		return res.status(400).send({ errors: ['Target user is not valid'] })
 	}
 
 	const existingFriendRequestFromUser = await database
@@ -146,7 +154,7 @@ const approveFriendRequest = async (req, res) => {
 	if (existingFriendRequestFromUser.length > 0) {
 		return res
 			.status(405)
-			.send({ error: 'Already exists a friend request between users' })
+			.send({ errors: ['Already exists a friend request between users'] })
 	}
 
 	await database.insert(friends).values({
@@ -162,7 +170,7 @@ const approveFriendRequest = async (req, res) => {
 
 	return createdFriendRequest.length > 0
 		? res.status(201).json(createdFriendRequest[0])
-		: res.status(500).send({ error: 'Unexpected error' })
+		: res.status(500).send({ errors: ['Unexpected error'] })
 }
 
 export default {

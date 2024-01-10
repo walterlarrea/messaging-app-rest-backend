@@ -24,12 +24,16 @@ const getById = async (req, res) => {
 	// closeConnection()
 	return result.length > 0
 		? res.json(result[0])
-		: res.status(404).json({ error: 'channel not found on the platform' })
+		: res
+				.status(404)
+				.json({ errors: [{ msg: 'channel not found on the platform' }] })
 }
 
 const deleteById = async (req, res) => {
 	if (!req.user?.id) {
-		return res.status(401).json({ error: 'token missing or invalid' })
+		return res
+			.status(401)
+			.json({ errors: [{ msg: 'token missing or invalid' }] })
 	}
 	const userId = parseInt(req.user.id)
 
@@ -42,11 +46,15 @@ const deleteById = async (req, res) => {
 		.where(eq(channels.id, requestedId))
 
 	if (result.length === 0) {
-		return res.status(404).json({ error: 'channel not found on the platform' })
+		return res
+			.status(404)
+			.json({ errors: [{ msg: 'channel not found on the platform' }] })
 	}
 	const channel = result[0]
 	if (channel.ownerId !== userId) {
-		return res.status(403).json({ error: 'not the owner of the channel' })
+		return res
+			.status(403)
+			.json({ errors: [{ msg: 'not the owner of the channel' }] })
 	}
 
 	const [deletionInfo] = await database
@@ -56,12 +64,16 @@ const deleteById = async (req, res) => {
 	// closeConnection()
 	return deletionInfo.affectedRows > 0
 		? res.status(200).json({ msg: 'channel deleted from the platform' })
-		: res.status(404).json({ error: 'not able to perform action delete' })
+		: res
+				.status(404)
+				.json({ errors: [{ msg: 'not able to perform action delete' }] })
 }
 
 const createChannel = async (req, res) => {
 	if (!req.user) {
-		return res.status(401).json({ error: 'token missing or invalid' })
+		return res
+			.status(401)
+			.json({ errors: [{ msg: 'token missing or invalid' }] })
 	}
 	const userId = parseInt(req.user.id)
 

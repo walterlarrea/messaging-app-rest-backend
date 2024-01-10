@@ -101,10 +101,10 @@ describe('Creating friends requests', async () => {
 			.post('/api/friends/request')
 			.set('Authorization', 'bearer ' + accessToken)
 			.send({ target_user_id: targetUser.id })
-		const { error } = requestResult.body
+		const { errors } = requestResult.body
 
 		assert.equal(requestResult.status, 400)
-		assert(error)
+		assert(errors)
 	})
 
 	after(async () => {
