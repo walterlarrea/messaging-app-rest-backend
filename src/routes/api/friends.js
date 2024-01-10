@@ -5,7 +5,7 @@ const router = Router()
 
 router.get('/', friendsController.getAllFriends)
 router.get('/incoming-requests', friendsController.friendRequests)
-router.patch('/request', friendsController.requestFriend)
-router.post('/request', friendsController.approveFriendRequest)
+router.patch('/request', friendsController.approveFriendRequest)
+router.post('/request', friendsController.requestFriend)
 
 export default router

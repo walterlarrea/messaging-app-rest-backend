@@ -55,7 +55,7 @@ describe('Creating friends requests', async () => {
 			)
 	})
 
-	it('succeeds with valid target user & valid auth token', async () => {
+	it('succeeds with valid target username & valid auth token', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/auth').send({
 			email: testUser.email,
@@ -74,7 +74,7 @@ describe('Creating friends requests', async () => {
 		const requestResult = await api
 			.post('/api/friends/request')
 			.set('Authorization', 'Bearer ' + accessToken)
-			.send({ target_user_id: targetUser.id })
+			.send({ target_username: targetUser.username })
 		const { uid1, uid2, status } = requestResult.body
 
 		assert(uid1)
