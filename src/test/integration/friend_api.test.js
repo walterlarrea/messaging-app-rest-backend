@@ -91,10 +91,11 @@ describe('Creating friends requests', async () => {
 		const { accessToken } = testUserResponse.body ?? undefined
 		assert(accessToken)
 
-		const [targetUser] = await database
+		const targetUsers = await database
 			.select()
 			.from(users)
-			.where(eq(users.email, initialUsers[2].email))
+			.where(eq(users.email, initialUsers[1].email))
+		const targetUser = targetUsers[0]
 		assert(targetUser)
 
 		const requestResult = await api
@@ -105,6 +106,77 @@ describe('Creating friends requests', async () => {
 
 		assert.equal(requestResult.status, 400)
 		assert(errors)
+	})
+
+	after(async () => {
+		await database.delete(friends)
+	})
+})
+
+describe('Listing friends requests', async () => {
+	beforeEach(async () => {
+		await database.delete(friends)
+		await database.delete(users)
+
+		await api.post('/register').send({
+			email: initialUsers[0].email,
+			first_name: initialUsers[0].firstName,
+			last_name: initialUsers[0].lastName || '',
+			username: initialUsers[0].username,
+			password: initialUsers[0].password,
+			password_confirm: initialUsers[0].password,
+		})
+
+		await api.post('/register').send({
+			email: initialUsers[1].email,
+			first_name: initialUsers[1].firstName,
+			last_name: initialUsers[1].lastName || '',
+			username: initialUsers[1].username,
+			password: initialUsers[1].password,
+			password_confirm: initialUsers[1].password,
+		})
+
+		// Change first and second user status to 'active'
+		await database
+			.update(users)
+			.set({ status: 'active' })
+			.where(
+				or(
+					eq(users.email, initialUsers[0].email),
+					eq(users.email, initialUsers[1].email)
+				)
+			)
+
+		const testUserResponse = await api.post('/auth').send({
+			email: initialUsers[0].email,
+			password: initialUsers[0].password,
+		})
+		const { accessToken } = testUserResponse.body ?? undefined
+		assert(accessToken)
+
+		await api
+			.post('/api/friends/request')
+			.set('Authorization', 'Bearer ' + accessToken)
+			.send({ target_username: initialUsers[1].username })
+	})
+
+	it('succeeds logged in for incoming requests', async () => {
+		const testUser = initialUsers[1]
+		const testUserResponse = await api.post('/auth').send({
+			email: testUser.email,
+			password: testUser.password,
+		})
+		const { accessToken } = testUserResponse.body ?? undefined
+		assert(accessToken)
+
+		const requestResult = await api
+			.get('/api/friends/incoming-requests')
+			.set('Authorization', 'Bearer ' + accessToken)
+		const friends = requestResult.body
+
+		assert(friends)
+		assert(friends.length > 0)
+		assert.equal(friends[0].username, initialUsers[0].username)
 	})
 
 	after(async () => {
