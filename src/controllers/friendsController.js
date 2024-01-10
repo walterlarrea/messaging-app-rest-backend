@@ -48,8 +48,19 @@ const friendRequests = async (req, res) => {
 	const [database] = await getDatabase()
 
 	const results = await database
-		.select()
+		.select({
+			id: users.id,
+			firstName: users.firstName,
+			username: users.username,
+		})
 		.from(friends)
+		.leftJoin(
+			users,
+			and(
+				ne(users.id, userId),
+				or(eq(users.id, friends.uid1), eq(users.id, friends.uid2))
+			)
+		)
 		.where(
 			or(
 				and(eq(friends.uid1, userId), eq(friends.status, 'req_uid2')),
