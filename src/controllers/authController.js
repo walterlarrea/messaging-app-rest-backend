@@ -11,7 +11,7 @@ export const handleLogin = async (req, res) => {
 	if (!email || !password) {
 		return res
 			.status(400)
-			.json({ errors: ['Email and passwords are required'] })
+			.json({ errors: [{ msg: 'Email and passwords are required' }] })
 	}
 
 	const [database] = await getDatabase()
@@ -29,21 +29,25 @@ export const handleLogin = async (req, res) => {
 		.where(like(users.email, email))
 
 	if (result.length === 0) {
-		return res.status(400).json({ errors: ['User not found'] })
+		return res.status(400).json({ errors: [{ msg: 'User not found' }] })
 	}
 	const user = result[0]
 	if (user.status !== 'active') {
-		return res.status(400).json({ errors: ['User not activated'] })
+		return res.status(400).json({ errors: [{ msg: 'User not activated' }] })
 	}
 	if (result.length > 1) {
-		return res.status(400).json({ errors: ['An unexpected error ocurred'] })
+		return res
+			.status(400)
+			.json({ errors: [{ msg: 'An unexpected error ocurred' }] })
 	}
 
 	const passwordCorrect =
 		user === null ? false : await compare(password, user.password)
 
 	if (!(user && passwordCorrect)) {
-		return res.status(400).json({ errors: ['invalid username or password'] })
+		return res
+			.status(400)
+			.json({ errors: [{ msg: 'invalid username or password' }] })
 	}
 
 	const userForToken = {
@@ -51,7 +55,7 @@ export const handleLogin = async (req, res) => {
 		id: user.id,
 	}
 	const accessToken = jwt.sign(userForToken, JWT_SECRET, {
-		expiresIn: '20s', // Put to 1 hour
+		expiresIn: '1h', // Put to 1 hour
 	})
 	const refreshToken = jwt.sign(userForToken, JWT_SECRET, {
 		expiresIn: '1d',

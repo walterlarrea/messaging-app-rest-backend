@@ -25,7 +25,7 @@ export const handleRefreshToken = async (req, res) => {
 		.where(like(users.refreshToken, refreshToken))
 
 	if (result.length === 0) {
-		return res.status(400).json({ errors: ['User not found'] })
+		return res.status(400).json({ errors: [{ msg: 'User not found' }] })
 	}
 	const user = result[0]
 
@@ -35,7 +35,7 @@ export const handleRefreshToken = async (req, res) => {
 			username: user.username,
 			id: user.id,
 		}
-		const accessToken = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '20s' })
+		const accessToken = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '1h' })
 		res.json({ accessToken, role: user.userType })
 	})
 }
