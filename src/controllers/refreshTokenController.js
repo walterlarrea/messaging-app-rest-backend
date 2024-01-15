@@ -8,34 +8,59 @@ export const handleRefreshToken = async (req, res) => {
 	const cookies = req.cookies
 
 	if (!cookies?.refresh_token) return res.sendStatus(401)
-	const refreshToken = cookies.refresh_token
+	const UserRefreshToken = cookies.refresh_token
+	console.log('token = ', UserRefreshToken)
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
-	const result = await database
-		.select({
-			id: users.id,
-			email: users.email,
-			username: users.username,
-			password: users.password,
-			userType: users.userType,
-			status: users.status,
-		})
-		.from(users)
-		.where(like(users.refreshToken, refreshToken))
+	jwt.verify(UserRefreshToken, process.env.JWT_SECRET, async (err, decoded) => {
+		if (err) return res.sendStatus(403)
 
-	if (result.length === 0) {
-		return res.status(400).json({ errors: [{ msg: 'User not found' }] })
-	}
-	const user = result[0]
+		const result = await database
+			.select({
+				id: users.id,
+				email: users.email,
+				username: users.username,
+				password: users.password,
+				userType: users.userType,
+				status: users.status,
+				refreshToken: users.refreshToken,
+			})
+			.from(users)
+			.where(like(users.username, decoded.username))
+		if (result.length === 0)
+			return res.status(400).json({ errors: [{ msg: 'User not found' }] })
 
-	jwt.verify(refreshToken, process.env.JWT_SECRET, (err, decoded) => {
-		if (err || user.username !== decoded.username) return res.sendStatus(403)
+		const user = result[0]
+		console.log('user token = ', user.refreshToken)
+
+		if (user.refreshToken !== UserRefreshToken)
+			return res
+				.status(403)
+				.json({ errors: [{ msg: 'Token provided is not valid' }] })
+
 		const userForToken = {
 			username: user.username,
 			id: user.id,
 		}
 		const accessToken = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '1h' })
+		const refreshToken = jwt.sign(userForToken, JWT_SECRET, {
+			expiresIn: '1d',
+		})
+
+		await database
+			.update(users)
+			.set({ refreshToken: refreshToken })
+			.where(like(users.email, user.email))
+
+		await closeConnection()
+
+		res.cookie('refresh_token', refreshToken, {
+			httpOnly: true,
+			sameSite: 'None',
+			secure: true,
+			maxAge: 1 * 60 * 60 * 1000,
+		})
 		res.json({ accessToken, role: user.userType })
 	})
 }

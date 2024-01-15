@@ -1,27 +1,34 @@
 {
-	"version": "5",
-	"dialect": "mysql",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "5",
-			"when": 1703987854163,
-			"tag": "0000_tiresome_post",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "5",
-			"when": 1704402971440,
-			"tag": "0001_polite_starjammers",
-			"breakpoints": true
-		},
-		{
-			"idx": 2,
-			"version": "5",
-			"when": 1704735572708,
-			"tag": "0002_quick_smiling_tiger",
-			"breakpoints": true
-		}
-	]
+  "version": "5",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1703987854163,
+      "tag": "0000_tiresome_post",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1704402971440,
+      "tag": "0001_polite_starjammers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1704735572708,
+      "tag": "0002_quick_smiling_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1704925163821,
+      "tag": "0003_shallow_rogue",
+      "breakpoints": true
+    }
+  ]
 }

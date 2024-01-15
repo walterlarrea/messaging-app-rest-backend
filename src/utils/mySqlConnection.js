@@ -17,7 +17,12 @@ export const getDatabase = async function () {
 		password: MYSQL_PASSWORD,
 		database: MYSQL_DATABASE,
 	})
+
 	const database = drizzle(dbConnection)
 
-	return [database, dbConnection.end]
+	const closeConnection = async () => {
+		await dbConnection.end()
+	}
+
+	return [database, closeConnection]
 }

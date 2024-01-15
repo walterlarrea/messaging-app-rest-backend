@@ -11,7 +11,7 @@ const getAllFriends = async (req, res) => {
 	}
 	const userId = parseInt(req.user.id)
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const results = await database
 		.select({
@@ -34,6 +34,8 @@ const getAllFriends = async (req, res) => {
 			)
 		)
 
+	await closeConnection()
+
 	return res.status(200).send(results)
 }
 
@@ -45,7 +47,7 @@ const friendRequests = async (req, res) => {
 	}
 	const userId = req.user.id
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const results = await database
 		.select({
@@ -68,6 +70,8 @@ const friendRequests = async (req, res) => {
 			)
 		)
 
+	await closeConnection()
+
 	return res.status(200).send(results)
 }
 
@@ -84,7 +88,7 @@ const approveFriendRequest = async (req, res) => {
 		return res.status(400).send({ errors: [{ msg: 'Target user is invalid' }] })
 	}
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const validFriendRequest = await database
 		.select()
@@ -136,6 +140,8 @@ const approveFriendRequest = async (req, res) => {
 			)
 		)
 
+	await closeConnection()
+
 	return approvedFriendRelation.length > 0
 		? res.status(200).json(approvedFriendRelation[0])
 		: res.status(500).send({ errors: [{ msg: 'Unexpected error' }] })
@@ -152,7 +158,7 @@ const requestFriend = async (req, res) => {
 		return res.status(400).send({ errors: ['Target user is invalid'] })
 	}
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const [targetUser] = await database
 		.select()
@@ -193,6 +199,8 @@ const requestFriend = async (req, res) => {
 		.select()
 		.from(friends)
 		.where(and(eq(friends.uid1, userId), eq(friends.uid2, targetUser.id)))
+
+	await closeConnection()
 
 	return createdFriendRequest.length > 0
 		? res.status(201).json(createdFriendRequest[0])

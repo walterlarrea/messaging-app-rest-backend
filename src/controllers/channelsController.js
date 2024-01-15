@@ -4,24 +4,26 @@ import { channels } from '../db/schema/channel.schema.js'
 import { eq, like } from 'drizzle-orm'
 
 const gelAllChannels = async (req, res) => {
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const result = await database.select().from(channels)
 
-	// closeConnection()
+	await closeConnection()
+
 	return res.json(result)
 }
 
 const getById = async (req, res) => {
 	const requestedId = req.params.id
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const result = await database
 		.select()
 		.from(channels)
 		.where(eq(channels.id, requestedId))
 
-	// closeConnection()
+	await closeConnection()
+
 	if (result.length > 0) {
 		res.json(result[0])
 	} else {
@@ -40,7 +42,7 @@ const deleteById = async (req, res) => {
 	const userId = parseInt(req.user.id)
 
 	const requestedId = req.params.id
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const result = await database
 		.select()
@@ -63,7 +65,8 @@ const deleteById = async (req, res) => {
 		.delete(channels)
 		.where(eq(channels.id, requestedId))
 
-	// closeConnection()
+	await closeConnection()
+
 	if (deletionInfo.affectedRows > 0) {
 		return res.status(200).json({ msg: 'channel deleted from the platform' })
 	} else {
@@ -88,7 +91,7 @@ const createChannel = async (req, res) => {
 		return res.status(422).json({ errors })
 	}
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const existingChannel = await database
 		.select()
@@ -114,7 +117,8 @@ const createChannel = async (req, res) => {
 		.from(channels)
 		.where(like(channels.title, title))
 
-	// closeConnection()
+	await closeConnection()
+
 	return res.status(201).json(channelCreated[0])
 }
 
