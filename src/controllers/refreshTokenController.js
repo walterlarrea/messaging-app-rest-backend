@@ -9,7 +9,6 @@ export const handleRefreshToken = async (req, res) => {
 
 	if (!cookies?.refresh_token) return res.sendStatus(401)
 	const UserRefreshToken = cookies.refresh_token
-	console.log('token = ', UserRefreshToken)
 
 	const [database, closeConnection] = await getDatabase()
 
@@ -32,7 +31,6 @@ export const handleRefreshToken = async (req, res) => {
 			return res.status(400).json({ errors: [{ msg: 'User not found' }] })
 
 		const user = result[0]
-		console.log('user token = ', user.refreshToken)
 
 		if (user.refreshToken !== UserRefreshToken)
 			return res

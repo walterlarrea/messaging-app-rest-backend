@@ -14,7 +14,9 @@ import friendsRouter from './src/routes/api/friends.js'
 
 const app = express()
 
-// app.use(middleware.requestLogger)
+if (process.env.NODE_ENV !== 'TEST') {
+	app.use(middleware.requestLogger)
+}
 
 app.use(middleware.credentials)
 
