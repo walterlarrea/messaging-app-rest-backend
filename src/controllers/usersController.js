@@ -3,7 +3,7 @@ import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
 const getAllUsers = async (req, res) => {
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const result = await database
 		.select({
@@ -17,13 +17,14 @@ const getAllUsers = async (req, res) => {
 		})
 		.from(users)
 
-	// closeConnection()
+	await closeConnection()
+
 	res.json(result)
 }
 
 const getByEmail = async (req, res) => {
 	const requestedEmail = req.params.email
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const result = await database
 		.select({
@@ -38,7 +39,8 @@ const getByEmail = async (req, res) => {
 		.from(users)
 		.where(like(users.email, requestedEmail))
 
-	// closeConnection()
+	await closeConnection()
+
 	if (result.length > 0) {
 		return res.json(result)
 	} else {

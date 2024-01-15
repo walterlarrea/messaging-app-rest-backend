@@ -12,7 +12,7 @@ export const handleNewUser = async (req, res) => {
 		return res.status(422).json({ errors })
 	}
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const existingUser = await database
 		.select({
@@ -53,6 +53,6 @@ export const handleNewUser = async (req, res) => {
 		.from(users)
 		.where(and(like(users.email, email), like(users.username, username)))
 
-	// closeConnection()
+	await closeConnection()
 	res.status(201).json(userCreated[0])
 }

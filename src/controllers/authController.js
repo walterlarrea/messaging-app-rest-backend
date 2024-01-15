@@ -14,7 +14,7 @@ export const handleLogin = async (req, res) => {
 			.json({ errors: [{ msg: 'Email and passwords are required' }] })
 	}
 
-	const [database] = await getDatabase()
+	const [database, closeConnection] = await getDatabase()
 
 	const result = await database
 		.select({
@@ -66,8 +66,8 @@ export const handleLogin = async (req, res) => {
 		.set({ refreshToken: refreshToken })
 		.where(like(users.email, email))
 
-	// closeConnection()
-	//res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 });
+	await closeConnection()
+
 	res.cookie('refresh_token', refreshToken, {
 		httpOnly: true,
 		sameSite: 'None',
