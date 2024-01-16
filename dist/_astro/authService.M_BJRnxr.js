@@ -1,1 +1,0 @@
-import{a}from"./axios.E8fTPdp3.js";async function n(t){return await a.post("/register",t).then(r=>r.data).catch(r=>{const e=r.response?.data;return Promise.reject(e)})}async function o(t){return a.post("/auth",t,{headers:{"Content-Type":"application/json"},withCredentials:!0}).then(r=>r.data).catch(r=>{const e=r.response?.data;return Promise.reject(e)})}export{o as l,n as r};
