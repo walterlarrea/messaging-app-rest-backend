@@ -82,9 +82,9 @@ const approveFriendRequest = async (req, res) => {
 			.json({ errors: [{ msg: 'token missing or invalid' }] })
 	}
 	const userId = parseInt(req.user.id)
-	const { approve_user_id } = req.body
+	const { req_user_id } = req.body
 
-	if (!approve_user_id || approve_user_id === userId) {
+	if (!req_user_id || req_user_id === userId) {
 		return res.status(400).send({ errors: [{ msg: 'Target user is invalid' }] })
 	}
 
@@ -96,11 +96,11 @@ const approveFriendRequest = async (req, res) => {
 		.where(
 			or(
 				and(
-					and(eq(friends.uid1, approve_user_id), eq(friends.uid2, userId)),
+					and(eq(friends.uid1, req_user_id), eq(friends.uid2, userId)),
 					eq(friends.status, 'req_uid1')
 				),
 				and(
-					and(eq(friends.uid1, userId), eq(friends.uid2, approve_user_id)),
+					and(eq(friends.uid1, userId), eq(friends.uid2, req_user_id)),
 					eq(friends.status, 'req_uid2')
 				)
 			)
