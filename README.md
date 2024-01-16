@@ -81,6 +81,7 @@ cp .env.example .env.production
 
 ```
 SERVER_PORT= Api server port
+NODE_ENV=EXAMPLE # Must be one of [TEST, PRODUCTION, or DEVELOPMENT]
 JWT_SECRET= The secret or private key to sign tokens with
 
 MYSQL_URI= Database host url
