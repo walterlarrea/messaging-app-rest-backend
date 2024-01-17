@@ -1,9 +1,9 @@
-import { getDatabase } from '../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../utils/mySqlConnection.js'
 import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
 const getAllUsers = async (req, res) => {
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const result = await database
 		.select({
@@ -24,7 +24,7 @@ const getAllUsers = async (req, res) => {
 
 const getByEmail = async (req, res) => {
 	const requestedEmail = req.params.email
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const result = await database
 		.select({

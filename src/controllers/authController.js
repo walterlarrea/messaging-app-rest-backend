@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { compare } from 'bcrypt'
 import { JWT_SECRET } from '../constants/config.js'
-import { getDatabase } from '../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../utils/mySqlConnection.js'
 import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
@@ -14,7 +14,7 @@ export const handleLogin = async (req, res) => {
 			.json({ errors: [{ msg: 'Email and passwords are required' }] })
 	}
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const result = await database
 		.select({

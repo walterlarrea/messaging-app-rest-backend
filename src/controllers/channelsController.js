@@ -1,10 +1,10 @@
 import { validationResult } from 'express-validator'
-import { getDatabase } from '../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../utils/mySqlConnection.js'
 import { channels } from '../db/schema/channel.schema.js'
 import { eq, like } from 'drizzle-orm'
 
 const gelAllChannels = async (req, res) => {
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const result = await database.select().from(channels)
 
@@ -15,7 +15,7 @@ const gelAllChannels = async (req, res) => {
 
 const getById = async (req, res) => {
 	const requestedId = req.params.id
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const result = await database
 		.select()
@@ -42,7 +42,7 @@ const deleteById = async (req, res) => {
 	const userId = parseInt(req.user.id)
 
 	const requestedId = req.params.id
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const result = await database
 		.select()
@@ -91,7 +91,7 @@ const createChannel = async (req, res) => {
 		return res.status(422).json({ errors })
 	}
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const existingChannel = await database
 		.select()

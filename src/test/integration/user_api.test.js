@@ -2,13 +2,13 @@ import { describe, it, after, beforeEach } from 'node:test'
 import assert from 'node:assert'
 import supertest from 'supertest'
 import app from '../../../app.js'
-import { getDatabase } from '../../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../../utils/mySqlConnection.js'
 import { initialUsers } from './initial_data.js'
 import { users } from '../../db/schema/user.schema.js'
 import { eq, or } from 'drizzle-orm'
 
 const api = supertest(app)
-const [database] = await getDatabase()
+const [database] = await getMysqlDatabase()
 
 describe('Retrieve users data', async () => {
 	beforeEach(async () => {

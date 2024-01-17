@@ -1,6 +1,6 @@
 import { validationResult } from 'express-validator'
 import { users } from '../db/schema/user.schema.js'
-import { getDatabase } from '../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../utils/mySqlConnection.js'
 import { and, like, or } from 'drizzle-orm'
 import { hash } from 'bcrypt'
 
@@ -12,7 +12,7 @@ export const handleNewUser = async (req, res) => {
 		return res.status(422).json({ errors })
 	}
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const existingUser = await database
 		.select({
