@@ -3,7 +3,7 @@ import messageController from '../../controllers/messageController.js'
 
 const router = Router()
 
-router.get('/', messageController.getUsersChat)
+router.get('/:id', messageController.getUsersChat)
 router.post('/', messageController.createMessage)
 
 export default router

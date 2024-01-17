@@ -5,7 +5,7 @@ const getUsersChat = async (req, res) => {
 		return res.status(401).json({ errors: ['token missing or invalid'] })
 	}
 	const userId = parseInt(req.user.id)
-	const { user_id: targetUserId } = req.body
+	const targetUserId = req.params.id
 
 	if (!targetUserId || targetUserId === userId) {
 		return res.status(400).send({ errors: ['Target user is invalid'] })
