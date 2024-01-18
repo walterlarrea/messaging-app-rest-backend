@@ -85,8 +85,8 @@ NODE_ENV=EXAMPLE # Must be one of [TEST, PRODUCTION, or DEVELOPMENT]
 JWT_SECRET= The secret or private key to sign tokens with
 
 
-MYSQL_URI= Database host url
-MYSQL_PORT= Database port to mysql server
+MYSQL_URI= Database host url # mysql service name on your docker-compose file
+MYSQL_PORT= Database port to mysql server # 3306 default
 MYSQL_USER= Database user name
 MYSQL_PASSWORD= Database user password
 MYSQL_DATABASE= Database name, which should be different for each environment
@@ -94,8 +94,8 @@ MYSQL_DATABASE= Database name, which should be different for each environment
 MYSQL_ROOT_PASSWORD= The root password for the mysql server
 
 
-MONGO_HOST= Database host url
-MONGO_PORT= Database port to mysql server
+MONGO_HOST= Database host url # mongo service name on your docker-compose file
+MONGO_PORT= Database port to mysql server # 27017 default
 MONGO_USERNAME= Database user name
 MONGO_PASSWORD= Database user password
 MONGO_DATABASE= Database name, which should be different for each environment
