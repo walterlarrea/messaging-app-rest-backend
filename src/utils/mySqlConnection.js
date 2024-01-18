@@ -9,7 +9,7 @@ import {
 	MYSQL_USER,
 } from '../constants/config.js'
 
-export const getDatabase = async function () {
+export const getMysqlDatabase = async function () {
 	const dbConnection = await mysql.createConnection({
 		host: MYSQL_URI,
 		port: MYSQL_PORT,

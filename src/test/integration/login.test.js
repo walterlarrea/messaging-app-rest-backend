@@ -2,7 +2,7 @@ import { describe, it, beforeEach, after } from 'node:test'
 import assert from 'node:assert'
 import supertest from 'supertest'
 import app from '../../../app.js'
-import { getDatabase } from '../../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../../utils/mySqlConnection.js'
 import { initialUsers } from './initial_data.js'
 import { users } from '../../db/schema/user.schema.js'
 import { channels } from '../../db/schema/channel.schema.js'
@@ -10,7 +10,7 @@ import { friends } from '../../db/schema/friend.schema.js'
 import { eq } from 'drizzle-orm'
 
 const api = supertest(app)
-const [database] = await getDatabase()
+const [database] = await getMysqlDatabase()
 
 describe('Login user', async () => {
 	beforeEach(async () => {

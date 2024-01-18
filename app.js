@@ -11,8 +11,23 @@ import middleware from './src/utils/middleware.js'
 import usersRouter from './src/routes/api/users.js'
 import channelsRouter from './src/routes/api/channels.js'
 import friendsRouter from './src/routes/api/friends.js'
+import messagesRouter from './src/routes/api/messages.js'
+import mongoose from 'mongoose'
+import logger from './src/utils/logger.js'
+import { MONGODB_URI } from './src/constants/config.js'
 
 const app = express()
+
+logger.info('connecting to', MONGODB_URI)
+
+mongoose
+	.connect(MONGODB_URI)
+	.then(() => {
+		logger.info('connected to MongoDB')
+	})
+	.catch((error) => {
+		logger.error('error connecting to MongoDB: ', error.message)
+	})
 
 if (process.env.NODE_ENV !== 'TEST') {
 	app.use(middleware.requestLogger)
@@ -37,6 +52,7 @@ app.use(middleware.verifyAccessToken)
 app.use('/api/user', usersRouter)
 app.use('/api/channel', channelsRouter)
 app.use('/api/friends', friendsRouter)
+app.use('/api/message', messagesRouter)
 
 app.use(middleware.unknownEndpoint)
 

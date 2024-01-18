@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '../constants/config.js'
-import { getDatabase } from '../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../utils/mySqlConnection.js'
 import { users } from '../db/schema/user.schema.js'
 import { like } from 'drizzle-orm'
 
@@ -10,7 +10,7 @@ export const handleRefreshToken = async (req, res) => {
 	if (!cookies?.refresh_token) return res.sendStatus(401)
 	const UserRefreshToken = cookies.refresh_token
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	jwt.verify(UserRefreshToken, process.env.JWT_SECRET, async (err, decoded) => {
 		if (err) return res.sendStatus(403)

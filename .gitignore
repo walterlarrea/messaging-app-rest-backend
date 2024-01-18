@@ -14,11 +14,14 @@
 # mysql deploy init scripts
 /docker/provision/mysql/init/init.sql
 
+/docker/provision/mongo/init/init-script.js
+/docker/provision/mongo/data
+
 # testing
 /coverage
 
 # production
-/build
+/dist
 
 # misc
 .DS_Store

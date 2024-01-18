@@ -1,4 +1,4 @@
-import { getDatabase } from '../utils/mySqlConnection.js'
+import { getMysqlDatabase } from '../utils/mySqlConnection.js'
 import { friends } from '../db/schema/friend.schema.js'
 import { and, eq, ne, or } from 'drizzle-orm'
 import { users } from '../db/schema/user.schema.js'
@@ -11,7 +11,7 @@ const getAllFriends = async (req, res) => {
 	}
 	const userId = parseInt(req.user.id)
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const results = await database
 		.select({
@@ -47,7 +47,7 @@ const friendRequests = async (req, res) => {
 	}
 	const userId = req.user.id
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const results = await database
 		.select({
@@ -88,7 +88,7 @@ const approveFriendRequest = async (req, res) => {
 		return res.status(400).send({ errors: [{ msg: 'Target user is invalid' }] })
 	}
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const validFriendRequest = await database
 		.select()
@@ -158,7 +158,7 @@ const requestFriend = async (req, res) => {
 		return res.status(400).send({ errors: ['Target user is invalid'] })
 	}
 
-	const [database, closeConnection] = await getDatabase()
+	const [database, closeConnection] = await getMysqlDatabase()
 
 	const [targetUser] = await database
 		.select()
