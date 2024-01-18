@@ -16,9 +16,10 @@
 		"db:deploy:production": "node --env-file=.env.production src/db/migrator.js",
 		"db:deploy:development": "node --env-file=.env.development src/db/migrator.js",
 		"db:deploy:test": "node --env-file=.env.test src/db/migrator.js",
-		"docker:build": "docker build -t walterlarrea/messaging-app-api:1.0 .",
-		"docker:setup": "docker compose --env-file=.env.test up --wait && printf \"> Waiting for service to be up and running ...\" && sleep 20 && npm run db:deploy:test && npm run db:deploy:development",
-		"build:ui": "rm -rf dist && cd ../messaging-app-ui/ && npm run build && cp -r dist ../messaging-app-rest-backend/"
+		"build:ui": "rm -rf dist && cd ../messaging-app-ui/ && npm run build && cp -r dist ../messaging-app-rest-backend/",
+		"build:docker": "docker build -t walterlarrea/messaging-app-api:1.0 .",
+		"deploy:docker": "docker compose --env-file=.env.test up --wait",
+		"deploy:docker:dbs": "npm run db:deploy:development && npm run db:deploy:test"
 	},
 	"author": "walter larrea",
 	"license": "ISC",

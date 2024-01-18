@@ -138,7 +138,7 @@ SET @DEV_USER_PASS = '';
 ...
 ```
 
-### 5. Copy the MONGO init file to `init-script.js` inside "/docker/provision/mongo/init/"
+### 7. Copy the MONGO init file to `init-script.js` inside "/docker/provision/mongo/init/"
 
 _This script will be used for the mongo server initial configuration, databases and users_
 
@@ -146,7 +146,7 @@ _This script will be used for the mongo server initial configuration, databases 
 cp /docker/provision/mongo/init/exampleinit-script.js /docker/provision/mongo/init/init-script.js
 ```
 
-### 6. Configure the user and database names, as well as collections in `init-script.js`
+### 8. Configure the user and database names, as well as collections in `init-script.js`
 
 _This will be used to initialize the mongo server in a docker container_
 
@@ -170,34 +170,48 @@ production.createCollection('OTHER_COLLECTION_NAME', { capped: false })
 ...
 ```
 
-### 7. Build api's docker image
+### 9. Build api's frontend & docker image
+
+_Having the frontend project's folders like this:_
 
 ```shell
-npm run docker:build
+common-folder/
+	messaging-app-rest-backend/
+		backend-project-files
+	messaging-app-ui/
+		frontend-project-files
 ```
 
-### 7. Deploy infrastructure
+```shell
+npm run build:ui
+```
+
+### 10. Deploy infrastructure
 
 ```shell
-npm run docker:setup
+npm run build:docker
+```
+
+```shell
+npm run deploy:docker
 ```
 
 _This command will:_
 
-- Build a docker container and configure the Mysql server
-- Create users and databases on the server
-- Deploy test and development schemas to the database
+- Deploy docker containers for the Api, MySql server, MongoDB server, and MongoDb web interface
+- Create users and databases on the SQL & noSQL servers
 
-### 8. Run the dev server
+### 11. On your 'messaging_app_api" docker container run the following command
 
 ```shell
-npm run dev
+npm run db:deploy:production
 ```
 
-### 9. Check server status
+_This command will migrate tables / schemas to the production database_
 
-- Visit [http://localhost:3001](http://localhost:3001) in your browser
-- Or use the SERVER_PORT specified in your .env.development file
+### 12. Check server status
+
+- Visit [http://localhost:5000](http://localhost:5000) in your browser
 
 ## Tests
 
