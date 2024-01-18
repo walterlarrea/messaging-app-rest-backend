@@ -43,7 +43,7 @@ export const handleNewUser = async (req, res) => {
 		username,
 		password: passwordHash,
 		userType: 'user',
-		status: 'inactive',
+		status: 'active',
 	})
 
 	const userCreated = await database
