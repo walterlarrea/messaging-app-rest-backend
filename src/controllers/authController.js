@@ -74,7 +74,7 @@ export const handleLogin = async (req, res) => {
 		secure: true,
 		maxAge: 1 * 60 * 60 * 1000,
 	})
-	res.status(200).send({ accessToken, role: user.userType })
+	res.status(200).send({ accessToken, role: user.userType, userId: user.id })
 }
 
 export default handleLogin
