@@ -59,6 +59,6 @@ export const handleRefreshToken = async (req, res) => {
 			secure: true,
 			maxAge: 1 * 60 * 60 * 1000,
 		})
-		res.json({ accessToken, role: user.userType })
+		res.json({ accessToken, role: user.userType, userId: user.id })
 	})
 }
