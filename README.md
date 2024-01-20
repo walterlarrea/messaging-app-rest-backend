@@ -43,6 +43,14 @@ Here's what you need to be able to run MessagingApp's API:
 - Node.js (version >= 20.10.0)
 - Docker (version >= 20)
 - Mysql (version >= 8.0)
+- Download the latest UI on the same folder from [Frontend source](https://github.com/walterlarrea/messaging-app-ui)
+```shell
+same-folder/
+	messaging-app-rest-backend/
+		backend-project-files
+	messaging-app-ui/
+		frontend-project-files
+```
 
 VSCode recommended Extensions:
 
@@ -172,6 +180,7 @@ production.createCollection('OTHER_COLLECTION_NAME', { capped: false })
 
 ### 9. Build api's frontend & docker image
 
+[Frontend source](https://github.com/walterlarrea/messaging-app-ui)
 _Having the frontend project's folders like this:_
 
 ```shell
