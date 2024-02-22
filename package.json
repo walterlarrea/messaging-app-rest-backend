@@ -17,8 +17,10 @@
 		"db:deploy:development": "node --env-file=.env.development src/db/migrator.js",
 		"db:deploy:test": "node --env-file=.env.test src/db/migrator.js",
 		"build:ui": "rm -rf dist && cd ../messaging-app-ui/ && npm run build && cp -r dist ../messaging-app-rest-backend/",
-		"build:docker": "docker build -t walterlarrea/messaging-app-api:1.0 .",
-		"deploy:docker": "docker compose --env-file=.env.test up --wait",
+		"build:api": "docker build -t messagingapp.azurecr.io/messaging-app-api:1.0 .",
+		"deploy:api": "docker push messagingapp.azurecr.io/messaging-app-api:1.0",
+		"build:docker": "docker compose --env-file=.env.test build",
+		"run:docker": "docker compose --env-file=.env.test up --wait",
 		"deploy:docker:dbs": "npm run db:deploy:development && npm run db:deploy:test"
 	},
 	"author": "walter larrea",
