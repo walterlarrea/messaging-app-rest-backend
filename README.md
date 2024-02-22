@@ -225,6 +225,12 @@ _This command will migrate tables / schemas to the development database_
 
 ## Tests
 
+### First migrate the latest database schemas to your DB server
+
+```shell
+npm run db:deploy:development
+```
+
 ### Integration tests are run using Node's Test Runner with the following command
 
 ```shell
