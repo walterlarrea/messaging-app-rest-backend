@@ -1,0 +1,25 @@
+name: Build Linux Container Image and Push to ACR
+run-name: New changes merged, deploying docker image to Production
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  Build-and-Push:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/docker-login@v1
+        with:
+          login-server: messagingapp.azurecr.io
+          username: ${{ secrets.AZ_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
+      - run: |
+          docker build . -t messagingapp.azurecr.io/messaging-app-api:${{ github.sha }}
+          docker push messagingapp.azurecr.io/messaging-app-api:${{ github.sha }}
