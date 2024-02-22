@@ -7,25 +7,26 @@ This api manages access control and data persistance for MessagingApp.
 Using continuous integration pipelines assures continuous delivery of functionality and good developer experience.
 Such as database migration and deployment, containerization, code linting and formatting, ORM for database access & management.
 
-Built on top of Node.js & Express.js, with technologies like Github Actions, Docker, Drizzle ORM, MySQL and more.
-
-<!-- ## Architecture diagram -->
-
-<!-- Diagram slot -->
+Built on top of Node.js & Astro using React, with technologies like Github Actions, Docker, Azure services, Drizzle ORM, MySQL, MongoDB end Socket.io among others.
 
 ## Features
 
 - **Secure:** Using a security first approach, for data and infrastructure
 - **Reliable:** Embracing comprehensive testing & code quality
 
-## Tech Stack
+## Tech stack Back & Frontend
 
 - [Node.js](https://nodejs.org/)
 - [Express.js](https://expressjs.com/)
 - [MySQL](https://www.mysql.com/)
+- [MongoDB](https://www.mongodb.com/)
 - [Drizzle ORM](https://orm.drizzle.team/)
+- [Mongoose](https://mongoosejs.com/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [React](https://es.react.dev/)
+- [Astro](https://astro.build/)
 
-## Packages
+### Important packages
 
 - [Bcrypt](https://www.npmjs.com/package/bcrypt)
 - [Jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
@@ -33,6 +34,13 @@ Built on top of Node.js & Express.js, with technologies like Github Actions, Doc
 - [Test Runner](https://nodejs.org/api/test.html)
 - [ESLint](https://eslint.org/)
 - [Prettier](https://prettier.io/)
+- 
+<!-- ## Architecture diagram -->
+<!-- Diagram slot -->
+
+## CI/CD Diagram
+
+![CI-CD](https://github.com/walterlarrea/messaging-app-rest-backend/assets/85652281/2f2b8f82-5ea2-4440-a2c4-2e5425086d5d)
 
 ## Getting Started
 
