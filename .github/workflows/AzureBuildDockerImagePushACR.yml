@@ -21,5 +21,5 @@ jobs:
           username: ${{ secrets.AZ_REGISTRY_USERNAME }}
           password: ${{ secrets.AZ_REGISTRY_PASSWORD }}
       - run: |
-          docker build . -t messagingapp.azurecr.io/messaging-app-api:${{ github.sha }}
-          docker push messagingapp.azurecr.io/messaging-app-api:${{ github.sha }}
+          docker build . -t messagingapp.azurecr.io/messaging-app-api:1.0
+          docker push messagingapp.azurecr.io/messaging-app-api:1.0
