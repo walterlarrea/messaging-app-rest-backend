@@ -1,0 +1,1 @@
+import{a as n}from"./index.rS7vpNfE.js";const s=n({currentUser:null});function o(e){s.set({...s.get(),currentUser:e})}function c(e){s.set({...s.get(),messages:e})}function u(e){const t=s.get(),a={...t,messages:t.messages};a.messages.push(e),s.set(a)}export{s as $,u as a,o as b,c as s};
