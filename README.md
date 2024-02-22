@@ -44,6 +44,7 @@ Here's what you need to be able to run MessagingApp's API:
 - Docker (version >= 20)
 - Mysql (version >= 8.0)
 - Download the latest UI on the same folder from [Frontend source](https://github.com/walterlarrea/messaging-app-ui)
+
 ```shell
 same-folder/
 	messaging-app-rest-backend/
@@ -88,7 +89,7 @@ cp .env.example .env.production
 ### 4. Configure the variables in `.env.test`, `.env.development` and `.env.production`
 
 ```
-SERVER_PORT= Api server port # 8080 for production environment
+SERVER_PORT= Api server port # 80 for production environment
 NODE_ENV=EXAMPLE # Must be one of [TEST, PRODUCTION, or DEVELOPMENT]
 JWT_SECRET= The secret or private key to sign tokens with
 
@@ -195,14 +196,14 @@ common-folder/
 npm run build:ui
 ```
 
-### 10. Deploy infrastructure
+### 10. Deploy development infrastructure
 
 ```shell
-npm run build:docker
+npm run build:api
 ```
 
 ```shell
-npm run deploy:docker
+npm run run:docker
 ```
 
 _This command will:_
@@ -210,24 +211,28 @@ _This command will:_
 - Deploy docker containers for the Api, MySql server, MongoDB server, and MongoDb web interface
 - Create users and databases on the SQL & noSQL servers
 
-### 11. On your 'messaging_app_api" docker container run the following command
+### 11. On your VSCode terminal 'messaging-app-rest-backend" run the following command
 
 ```shell
-npm run db:deploy:production
+npm run db:deploy:development
 ```
 
-_This command will migrate tables / schemas to the production database_
+_This command will migrate tables / schemas to the development database_
 
 ### 12. Check server status
 
-- Visit [http://localhost:5000](http://localhost:5000) in your browser
+- Visit [http://localhost:3001](http://localhost:3001) in your browser
 
 ## Tests
+
+### First migrate the latest database schemas to your DB server
+
+```shell
+npm run db:deploy:development
+```
 
 ### Integration tests are run using Node's Test Runner with the following command
 
 ```shell
 npm test
 ```
-
-## Fully automated production environment is in progress
