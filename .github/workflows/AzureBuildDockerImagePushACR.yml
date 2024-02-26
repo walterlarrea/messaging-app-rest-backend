@@ -3,6 +3,8 @@ run-name: New changes merged, deploying docker image to Production
 
 on:
   pull_request:
+    branches:
+      - main
     types:
       - closed
 

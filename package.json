@@ -5,6 +5,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"prestart": "test -e .env.production || touch .env.production",
 		"start": "node --env-file=.env.production index.js",
 		"dev": "nodemon --env-file=.env.development index.js",
 		"test": "node --test --env-file=.env.test src/test/integration/index.test.js",
