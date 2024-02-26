@@ -2,7 +2,7 @@ version: '3'
 
 services:
   messaging-app-api:
-    image: pruebawalter.azurecr.io/messaging-app-api:1.0
+    image: messagingapp.azurecr.io/messaging-app-api:1.0
     container_name: messaging-app-api
     restart: always
     ports:
