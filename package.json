@@ -21,7 +21,7 @@
 		"build:api": "docker build -t messagingapp.azurecr.io/messaging-app-api:1.0 .",
 		"deploy:api": "docker push messagingapp.azurecr.io/messaging-app-api:1.0",
 		"build:docker": "docker compose --env-file=.env.test build",
-		"run:docker": "docker compose --env-file=.env.test up --wait",
+		"run:docker": "docker compose --env-file=.env.development up --wait",
 		"deploy:docker:dbs": "npm run db:deploy:development && npm run db:deploy:test"
 	},
 	"author": "walter larrea",
