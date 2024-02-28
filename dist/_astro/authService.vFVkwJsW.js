@@ -1,1 +1,0 @@
-import{a,m as e}from"./axios.4P0BYSc3.js";async function s(t){return await a.post("/register",t).then(r=>r.data).catch(e)}async function i(t){return a.post("/auth",t,{headers:{"Content-Type":"application/json"},withCredentials:!0}).then(r=>r.data).catch(e)}export{i as l,s as r};
