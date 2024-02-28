@@ -1,0 +1,1 @@
+ALTER TABLE `user_friends` ADD `unseen` boolean DEFAULT true;
