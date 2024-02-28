@@ -54,6 +54,7 @@ const friendRequests = async (req, res) => {
 			id: users.id,
 			firstName: users.firstName,
 			username: users.username,
+			unseen: friends.unseen,
 		})
 		.from(friends)
 		.leftJoin(
@@ -73,6 +74,85 @@ const friendRequests = async (req, res) => {
 	await closeConnection()
 
 	return res.status(200).send(results)
+}
+
+const markSeenFriendRequest = async (req, res) => {
+	if (!req.user?.id) {
+		return res
+			.status(401)
+			.json({ errors: [{ msg: 'token missing or invalid' }] })
+	}
+	const userId = parseInt(req.user.id)
+	const { req_user_id } = req.body
+
+	if (!req_user_id || req_user_id === userId) {
+		return res.status(400).send({ errors: [{ msg: 'Target user is invalid' }] })
+	}
+
+	const [database, closeConnection] = await getMysqlDatabase()
+
+	const validFriendRequest = await database
+		.select()
+		.from(friends)
+		.where(
+			or(
+				and(
+					and(eq(friends.uid1, req_user_id), eq(friends.uid2, userId)),
+					eq(friends.status, 'req_uid1')
+				),
+				and(
+					and(eq(friends.uid1, userId), eq(friends.uid2, req_user_id)),
+					eq(friends.status, 'req_uid2')
+				)
+			)
+		)
+
+	if (validFriendRequest.length === 0) {
+		return res
+			.status(404)
+			.send({ errors: [{ msg: 'Pending friend request not found' }] })
+	}
+
+	const friendRequest = validFriendRequest[0]
+
+	await database
+		.update(friends)
+		.set({ unseen: false })
+		.where(
+			and(
+				and(
+					eq(friends.uid1, friendRequest.uid1),
+					eq(friends.uid2, friendRequest.uid2)
+				),
+				eq(friends.status, friendRequest.status)
+			)
+		)
+
+	const seenFriendRequest = await database
+		.select({
+			id: users.id,
+			firstName: users.firstName,
+			username: users.username,
+			unseen: friends.unseen,
+			uid1: friends.uid1,
+		})
+		.from(friends)
+		.leftJoin(users, eq(users.id, friends.uid2))
+		.where(
+			and(
+				and(
+					eq(friends.uid1, friendRequest.uid1),
+					eq(friends.uid2, friendRequest.uid2)
+				),
+				eq(friends.unseen, false)
+			)
+		)
+
+	await closeConnection()
+
+	return seenFriendRequest.length > 0
+		? res.status(200).json(seenFriendRequest[0])
+		: res.status(500).send({ errors: [{ msg: 'Unexpected error' }] })
 }
 
 const approveFriendRequest = async (req, res) => {
@@ -116,7 +196,7 @@ const approveFriendRequest = async (req, res) => {
 
 	await database
 		.update(friends)
-		.set({ status: 'approved' })
+		.set({ status: 'approved', unseen: false })
 		.where(
 			and(
 				and(
@@ -128,8 +208,15 @@ const approveFriendRequest = async (req, res) => {
 		)
 
 	const approvedFriendRelation = await database
-		.select()
+		.select({
+			id: users.id,
+			firstName: users.firstName,
+			username: users.username,
+			unseen: friends.unseen,
+			uid1: friends.uid1,
+		})
 		.from(friends)
+		.leftJoin(users, eq(users.id, friends.uid2))
 		.where(
 			and(
 				and(
@@ -141,6 +228,12 @@ const approveFriendRequest = async (req, res) => {
 		)
 
 	await closeConnection()
+
+	const receiverSocket = global.io.sockets.sockets.get(
+		global.liveSockets[approvedFriendRelation[0].uid1]
+	)
+	if (receiverSocket)
+		receiverSocket.emit('approvedFriendRequest', approvedFriendRelation[0])
 
 	return approvedFriendRelation.length > 0
 		? res.status(200).json(approvedFriendRelation[0])
@@ -196,11 +289,24 @@ const requestFriend = async (req, res) => {
 	})
 
 	const createdFriendRequest = await database
-		.select()
+		.select({
+			id: users.id,
+			firstName: users.firstName,
+			username: users.username,
+			unseen: friends.unseen,
+		})
 		.from(friends)
+		.leftJoin(users, eq(users.id, friends.uid1))
 		.where(and(eq(friends.uid1, userId), eq(friends.uid2, targetUser.id)))
 
 	await closeConnection()
+
+	const receiverSocket = global.io.sockets.sockets.get(
+		global.liveSockets[targetUser.id]
+	)
+
+	if (receiverSocket)
+		receiverSocket.emit('getFriendRequest', createdFriendRequest[0])
 
 	return createdFriendRequest.length > 0
 		? res.status(201).json(createdFriendRequest[0])
@@ -212,4 +318,5 @@ export default {
 	friendRequests,
 	requestFriend,
 	approveFriendRequest,
+	markSeenFriendRequest,
 }
