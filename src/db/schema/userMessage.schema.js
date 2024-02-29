@@ -17,6 +17,10 @@ const userMessageSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+	unseen: {
+		type: Boolean,
+		default: true,
+	},
 })
 
 userMessageSchema.set('toJSON', {

@@ -3,6 +3,7 @@ import {
 	mysqlEnum,
 	bigint,
 	primaryKey,
+	boolean,
 } from 'drizzle-orm/mysql-core'
 import { users } from './user.schema.js'
 
@@ -16,6 +17,7 @@ export const friends = mysqlTable(
 			.references(() => users.id)
 			.notNull(),
 		status: mysqlEnum('status', ['req_uid1', 'req_uid2', 'approved']),
+		unseen: boolean('unseen').default(true),
 	},
 	(table) => {
 		return {
