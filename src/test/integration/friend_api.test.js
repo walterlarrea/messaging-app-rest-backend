@@ -75,9 +75,9 @@ describe('Creating friends requests', async () => {
 			.post('/api/friends/request')
 			.set('Authorization', 'Bearer ' + accessToken)
 			.send({ target_username: targetUser.username })
-		const { uid1, uid2, status } = requestResult.body
+		const { id, uid2, status } = requestResult.body
 
-		assert(uid1)
+		assert(id)
 		assert.equal(uid2, targetUser.id)
 		assert.equal(status, 'req_uid1')
 	})

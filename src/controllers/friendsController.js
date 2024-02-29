@@ -293,7 +293,9 @@ const requestFriend = async (req, res) => {
 			id: users.id,
 			firstName: users.firstName,
 			username: users.username,
+			status: friends.status,
 			unseen: friends.unseen,
+			uid2: friends.uid2,
 		})
 		.from(friends)
 		.leftJoin(users, eq(users.id, friends.uid1))
@@ -301,9 +303,9 @@ const requestFriend = async (req, res) => {
 
 	await closeConnection()
 
-	const receiverSocket = global.io.sockets.sockets.get(
-		global.liveSockets[targetUser.id]
-	)
+	const receiverSocket =
+		global.io &&
+		global.io.sockets.sockets.get(global.liveSockets[targetUser.id])
 
 	if (receiverSocket)
 		receiverSocket.emit('getFriendRequest', createdFriendRequest[0])
