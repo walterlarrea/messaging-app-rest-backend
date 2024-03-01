@@ -96,6 +96,26 @@ describe('Registering new users', async () => {
 		assert(createdUser)
 	})
 
+	it('fails if password does not have at least one uppercase letter, one lowercase letter, and one digit', async () => {
+		const testUser = initialUsers[2]
+		const testUserResponse = await api.post('/register').send({
+			email: testUser.email,
+			first_name: testUser.firstName,
+			username: testUser.username,
+			password: testUser.password,
+			password_confirm: testUser.password,
+		})
+
+		const result = await database.select().from(users)
+
+		const createdUser = result.find(
+			(user) => user.username === testUser.username
+		)
+
+		assert.strictEqual(testUserResponse.status, 422)
+		assert.strictEqual(createdUser, undefined)
+	})
+
 	it('fails if email is not provided', async () => {
 		const testUser = initialUsers[0]
 		const testUserResponse = await api.post('/register').send({
@@ -112,7 +132,7 @@ describe('Registering new users', async () => {
 		)
 
 		assert.strictEqual(testUserResponse.status, 422)
-		assert.ifError(createdUser)
+		assert.strictEqual(createdUser, undefined)
 	})
 
 	it('fails if username is not provided', async () => {
