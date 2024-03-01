@@ -48,6 +48,12 @@ const userValidation = checkSchema({
 			options: { min: 8, max: 30 },
 			errorMessage: 'Must have between 8 and 30 characters',
 		},
+		custom: {
+			options: (value) =>
+				/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,30}$/.test(value),
+			errorMessage:
+				'Must have at least one uppercase letter, one lowercase letter, and one digit',
+		},
 		errorMessage: 'Invalid password',
 	},
 	password_confirm: {
