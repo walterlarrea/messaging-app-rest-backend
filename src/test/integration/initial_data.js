@@ -4,14 +4,14 @@ export const initialUsers = [
 		firstName: 'Walter',
 		lastName: 'Larrea',
 		username: 'Walli',
-		password: '12345678',
+		password: '12345678App',
 	},
 	{
 		email: 'eduardo@mail.com',
 		firstName: 'Eduardo',
 		lastName: 'Larrea',
 		username: 'Eduli',
-		password: '12345678',
+		password: '12345678App',
 	},
 	{
 		email: 'gabriel@mail.com',

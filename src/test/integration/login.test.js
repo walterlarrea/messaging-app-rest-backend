@@ -49,6 +49,38 @@ describe('Login user', async () => {
 		assert(role)
 	})
 
+	it('fails with non registered email', async () => {
+		const testUser = initialUsers[1]
+		const testUserResponse = await api.post('/auth').send({
+			email: testUser.email,
+			password: testUser.password,
+		})
+
+		const { accessToken, role } = testUserResponse.body ?? {}
+
+		assert.strictEqual(testUserResponse.status, 400)
+		assert(!accessToken)
+		assert(!role)
+	})
+
+	after(async () => {
+		await database.delete(users)
+	})
+
+	it('fails with existent mail but wrong password', async () => {
+		const testUser = initialUsers[0]
+		const testUserResponse = await api.post('/auth').send({
+			email: testUser.email,
+			password: 'IncorrectPass123',
+		})
+
+		const { accessToken, role } = testUserResponse.body ?? {}
+
+		assert.strictEqual(testUserResponse.status, 400)
+		assert(!accessToken)
+		assert(!role)
+	})
+
 	after(async () => {
 		await database.delete(users)
 	})
